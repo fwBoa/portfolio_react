@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Styles globaux */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+code {
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+/* Animation personnalisée pour le flip */
+.flip-enter {
+  transform: rotateY(90deg);
+  opacity: 0;
+}
+
+.flip-enter-active {
+  transform: rotateY(0deg);
+  opacity: 1;
+  transition: all 0.6s ease-in-out;
+}
+
+.flip-exit {
+  transform: rotateY(0deg);
+  opacity: 1;
+}
+
+.flip-exit-active {
+  transform: rotateY(-90deg);
+  opacity: 0;
+  transition: all 0.6s ease-in-out;
+}
+
+/* Scrollbar personnalisée pour le mode développeur */
+.dev-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dev-scrollbar::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.dev-scrollbar::-webkit-scrollbar-thumb {
+  background: #00ff41;
+  border-radius: 4px;
+}
+
+.dev-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #00cc33;
+}
+
+/* Animation pour le terminal */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink {
+  animation: blink 1s infinite;
+}
+
+/* Effet Matrix pour le mode développeur */
+@keyframes matrix-fall {
+  0% { transform: translateY(-100%); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.matrix-char {
+  animation: matrix-fall linear infinite;
+}
