@@ -102,39 +102,39 @@ Vous êtes un vrai gamer 🎮
     };
   }, []);
 
-  // Détection du scroll pour basculer (bonus)
-  useEffect(() => {
-    let lastScrollY = window.scrollY;
-    let scrollCount = 0;
+  // EASTER EGG DÉSACTIVÉ - Détection du scroll pour basculer (bonus)
+  // useEffect(() => {
+  //   let lastScrollY = window.scrollY;
+  //   let scrollCount = 0;
 
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+  //   const handleScroll = () => {
+  //     const currentScrollY = window.scrollY;
       
-      // Détecte un scroll rapide vers le bas
-      if (currentScrollY > lastScrollY + 100) {
-        scrollCount++;
+  //     // Détecte un scroll rapide vers le bas
+  //     if (currentScrollY > lastScrollY + 100) {
+  //       scrollCount++;
         
-        if (scrollCount >= 5) {
-          console.log('🎢 Scroll rapide détecté ! Basculement automatique...');
-          toggleMode();
-          scrollCount = 0;
-        }
-      }
+  //       if (scrollCount >= 5) {
+  //         console.log('🎢 Scroll rapide détecté ! Basculement automatique...');
+  //         toggleMode();
+  //         scrollCount = 0;
+  //       }
+  //     }
       
-      lastScrollY = currentScrollY;
-    };
+  //     lastScrollY = currentScrollY;
+  //   };
 
-    // Réinitialise le compteur après 2 secondes
-    const resetScrollCount = setInterval(() => {
-      scrollCount = 0;
-    }, 2000);
+  //   // Réinitialise le compteur après 2 secondes
+  //   const resetScrollCount = setInterval(() => {
+  //     scrollCount = 0;
+  //   }, 2000);
 
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearInterval(resetScrollCount);
-    };
-  }, []);
+  //   window.addEventListener('scroll', handleScroll);
+  //   return () => {
+  //     window.removeEventListener('scroll', handleScroll);
+  //     clearInterval(resetScrollCount);
+  //   };
+  // }, []);
 
   // Raccourci clavier Ctrl/Cmd + Shift + D pour basculer
   useEffect(() => {

@@ -46,10 +46,10 @@ const DevFace = () => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="container mx-auto px-6 mb-12"
+        className="container mx-auto px-4 sm:px-6 mb-8 sm:mb-12"
       >
-        <div className="flex justify-center">
-          <pre className="text-dev-accent font-mono text-xs md:text-sm overflow-x-auto dev-scrollbar text-center">
+        <div className="flex justify-center overflow-x-auto">
+          <pre className="text-dev-accent font-mono text-[0.5rem] sm:text-xs md:text-sm dev-scrollbar text-center whitespace-pre">
 {`
      ██╗███████╗ █████╗ ███╗   ██╗      ██████╗  █████╗ ██╗   ██╗██╗██████╗ 
      ██║██╔════╝██╔══██╗████╗  ██║      ██╔══██╗██╔══██╗██║   ██║██║██╔══██╗
@@ -61,7 +61,6 @@ const DevFace = () => {
            > ON THE WAY TO BECOME A BETTER DEVELOPER <
 `}
           </pre>
-          {/*//le titre n'etait pas centrer, il a fallu passer par une div et ensuite rentrer via tailwinds, flex, justify-center et text center à l'interieur du pre.*/}
         </div> 
         
 
@@ -74,25 +73,25 @@ const DevFace = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="container mx-auto px-6 mb-12"
+        className="container mx-auto px-4 sm:px-6 mb-8 sm:mb-12"
       >
         <motion.h2
           variants={itemVariants}
-          className="text-3xl font-mono text-dev-accent mb-8"
+          className="text-2xl sm:text-3xl font-mono text-dev-accent mb-6 sm:mb-8"
         >
           {'// Statistiques Techniques'}
         </motion.h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {/* Carte Build Time */}
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.05, borderColor: '#00ff41' }}
-            className="bg-[#1a1a1a] p-6 rounded-lg border border-dev-accent/30 transition-all"
+            className="bg-[#1a1a1a] p-4 sm:p-6 rounded-lg border border-dev-accent/30 transition-all"
           >
-            <FaChartBar className="text-dev-accent text-3xl mb-4" />
-            <h3 className="text-gray-400 text-sm mb-2 font-mono">Build Time</h3>
-            <p className="text-2xl font-bold text-dev-accent font-mono">
+            <FaChartBar className="text-dev-accent text-2xl sm:text-3xl mb-2 sm:mb-4" />
+            <h3 className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2 font-mono">Build Time</h3>
+            <p className="text-lg sm:text-2xl font-bold text-dev-accent font-mono">
               {techStats.buildTime}
             </p>
           </motion.div>
@@ -101,11 +100,11 @@ const DevFace = () => {
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.05, borderColor: '#00ff41' }}
-            className="bg-[#1a1a1a] p-6 rounded-lg border border-dev-accent/30 transition-all"
+            className="bg-[#1a1a1a] p-4 sm:p-6 rounded-lg border border-dev-accent/30 transition-all"
           >
-            <FaCode className="text-dev-accent text-3xl mb-4" />
-            <h3 className="text-gray-400 text-sm mb-2 font-mono">Bundle Size</h3>
-            <p className="text-2xl font-bold text-dev-accent font-mono">
+            <FaCode className="text-dev-accent text-2xl sm:text-3xl mb-2 sm:mb-4" />
+            <h3 className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2 font-mono">Bundle Size</h3>
+            <p className="text-lg sm:text-2xl font-bold text-dev-accent font-mono">
               {techStats.bundleSize}
             </p>
           </motion.div>
@@ -114,11 +113,11 @@ const DevFace = () => {
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.05, borderColor: '#00ff41' }}
-            className="bg-[#1a1a1a] p-6 rounded-lg border border-dev-accent/30 transition-all"
+            className="bg-[#1a1a1a] p-4 sm:p-6 rounded-lg border border-dev-accent/30 transition-all"
           >
-            <FaTerminal className="text-dev-accent text-3xl mb-4" />
-            <h3 className="text-gray-400 text-sm mb-2 font-mono">Components</h3>
-            <p className="text-2xl font-bold text-dev-accent font-mono">
+            <FaTerminal className="text-dev-accent text-2xl sm:text-3xl mb-2 sm:mb-4" />
+            <h3 className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2 font-mono">Components</h3>
+            <p className="text-lg sm:text-2xl font-bold text-dev-accent font-mono">
               {techStats.components}
             </p>
           </motion.div>
@@ -127,11 +126,11 @@ const DevFace = () => {
           <motion.div
             variants={itemVariants}
             whileHover={{ scale: 1.05, borderColor: '#00ff41' }}
-            className="bg-[#1a1a1a] p-6 rounded-lg border border-dev-accent/30 transition-all"
+            className="bg-[#1a1a1a] p-4 sm:p-6 rounded-lg border border-dev-accent/30 transition-all"
           >
-            <FaGithub className="text-dev-accent text-3xl mb-4" />
-            <h3 className="text-gray-400 text-sm mb-2 font-mono">lignes de code</h3>
-            <p className="text-2xl font-bold text-dev-accent font-mono">
+            <FaGithub className="text-dev-accent text-2xl sm:text-3xl mb-2 sm:mb-4" />
+            <h3 className="text-gray-400 text-xs sm:text-sm mb-1 sm:mb-2 font-mono">Lignes de code</h3>
+            <p className="text-lg sm:text-2xl font-bold text-dev-accent font-mono">
               {techStats.linesOfCode.toLocaleString()}
             </p>
           </motion.div>
@@ -140,20 +139,20 @@ const DevFace = () => {
         {/* Technologies utilisées */}
         <motion.div
           variants={itemVariants}
-          className="mt-8 bg-[#1a1a1a] p-6 rounded-lg border border-dev-accent/30"
+          className="mt-6 sm:mt-8 bg-[#1a1a1a] p-4 sm:p-6 rounded-lg border border-dev-accent/30"
         >
-          <h3 className="text-xl font-mono text-dev-accent mb-4">
+          <h3 className="text-lg sm:text-xl font-mono text-dev-accent mb-3 sm:mb-4">
             {'// Tech Stack'}
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 sm:gap-4">
             {techStats.technologies.map((tech, index) => (
               <div
                 key={index}
                 className="flex flex-col items-center text-center"
               >
-                <span className="text-3xl mb-2">{tech.logo}</span>
-                <span className="text-gray-300 font-mono text-sm">{tech.name}</span>
-                <span className="text-dev-accent text-xs">{tech.version}</span>
+                <span className="text-2xl sm:text-3xl mb-1 sm:mb-2">{tech.logo}</span>
+                <span className="text-gray-300 font-mono text-xs sm:text-sm">{tech.name}</span>
+                <span className="text-dev-accent text-[0.65rem] sm:text-xs">{tech.version}</span>
               </div>
             ))}
           </div>
@@ -167,18 +166,18 @@ const DevFace = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.1 }}
-        className="container mx-auto px-6 mb-12"
+        className="container mx-auto px-4 sm:px-6 mb-8 sm:mb-12"
       >
         <motion.h2
           variants={itemVariants}
-          className="text-3xl font-mono text-dev-accent mb-8"
+          className="text-2xl sm:text-3xl font-mono text-dev-accent mb-6 sm:mb-8"
         >
           {'// Projets'}
         </motion.h2>
 
         {/* Sélecteur de projet */}
-        <motion.div variants={itemVariants} className="mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <motion.div variants={itemVariants} className="mb-6 sm:mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {projects.map((project, index) => (
               <div
                 key={project.id}
@@ -199,7 +198,7 @@ const DevFace = () => {
         {selectedProject && (
           <motion.div
             variants={itemVariants}
-            className="mb-8"
+            className="mb-6 sm:mb-8"
           >
             <CodeDisplay
               code={selectedProject.code}
@@ -217,11 +216,11 @@ const DevFace = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="container mx-auto px-6 mb-12"
+        className="container mx-auto px-4 sm:px-6 mb-8 sm:mb-12"
       >
         <motion.h2
           variants={itemVariants}
-          className="text-3xl font-mono text-dev-accent mb-8"
+          className="text-2xl sm:text-3xl font-mono text-dev-accent mb-6 sm:mb-8"
         >
           {'// Terminal'}
         </motion.h2>
@@ -236,9 +235,9 @@ const DevFace = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="container mx-auto px-6 mt-12 pt-8 border-t border-dev-accent/30"
+        className="container mx-auto px-4 sm:px-6 mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-dev-accent/30"
       >
-        <p className="text-center text-gray-500 font-mono text-sm">
+        <p className="text-center text-gray-500 font-mono text-xs sm:text-sm">
           {''}
         </p>
         <p className="text-center text-dev-accent font-mono text-xs mt-2">
