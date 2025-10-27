@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaTimes } from 'react-icons/fa';
+import emailjs from '@emailjs/browser';
 import ProjectCard from './ProjectCard';
 import { projects } from '../data/projects';
 
@@ -9,6 +10,36 @@ import { projects } from '../data/projects';
  */
 const Face = () => {
   const [showLegalModal, setShowLegalModal] = useState(false);
+  const [formStatus, setFormStatus] = useState('idle'); // idle, sending, success, error
+  const formRef = useRef();
+
+  // Fonction pour gérer l'envoi du formulaire avec EmailJS
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setFormStatus('sending');
+
+    // Récupération des clés depuis les variables d'environnement
+    const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, formRef.current, PUBLIC_KEY)
+      .then((result) => {
+        console.log('Email envoyé avec succès:', result.text);
+        setFormStatus('success');
+        formRef.current.reset();
+        
+        // Réinitialiser le statut après 5 secondes
+        setTimeout(() => setFormStatus('idle'), 5000);
+      })
+      .catch((error) => {
+        console.error('Erreur lors de l\'envoi:', error.text);
+        setFormStatus('error');
+        
+        // Réinitialiser le statut après 5 secondes
+        setTimeout(() => setFormStatus('idle'), 5000);
+      });
+  };
 
   // Animation variants pour les sections
   const sectionVariants = {
@@ -155,7 +186,7 @@ const Face = () => {
           </p>
 
           {/* Formulaire de contact */}
-          <form className="space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="name" className="block text-minimal-text font-medium mb-2">
                 Nom
@@ -163,9 +194,11 @@ const Face = () => {
               <input
                 type="text"
                 id="name"
-                name="name"
+                name="from_name"
+                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-minimal-text transition-all"
                 placeholder="Votre nom"
+                disabled={formStatus === 'sending'}
               />
             </div>
 
@@ -176,9 +209,11 @@ const Face = () => {
               <input
                 type="email"
                 id="email"
-                name="email"
+                name="from_email"
+                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-minimal-text transition-all"
                 placeholder="votre@email.com"
+                disabled={formStatus === 'sending'}
               />
             </div>
 
@@ -190,18 +225,46 @@ const Face = () => {
                 id="message"
                 name="message"
                 rows="5"
+                required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-minimal-text transition-all resize-none"
                 placeholder="Votre message..."
+                disabled={formStatus === 'sending'}
               />
             </div>
 
+            {/* Message de statut */}
+            {formStatus === 'success' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg"
+              >
+                ✅ Message envoyé avec succès ! Je vous répondrai bientôt.
+              </motion.div>
+            )}
+
+            {formStatus === 'error' && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"
+              >
+                ❌ Erreur lors de l'envoi. Veuillez réessayer ou me contacter directement par email.
+              </motion.div>
+            )}
+
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: formStatus === 'sending' ? 1 : 1.02 }}
+              whileTap={{ scale: formStatus === 'sending' ? 1 : 0.98 }}
               type="submit"
-              className="w-full px-8 py-4 bg-minimal-text text-white rounded-lg hover:bg-[#2a5159] transition-colors text-lg font-medium"
+              disabled={formStatus === 'sending'}
+              className={`w-full px-8 py-4 rounded-lg text-lg font-medium transition-all ${
+                formStatus === 'sending'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-minimal-text hover:bg-[#2a5159] text-white'
+              }`}
             >
-              Envoyer le message
+              {formStatus === 'sending' ? 'Envoi en cours...' : 'Envoyer le message'}
             </motion.button>
           </form>
         </div>
