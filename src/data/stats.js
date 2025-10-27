@@ -3,7 +3,7 @@ export const techStats = {
   buildTime: "2.3s", // temps de compilation 
   bundleSize: "245 KB", 
   components: 12,
-  linesOfCode: 2847,
+  linesOfCode: 1936, // Calculé avec: find src -name "*.jsx" -o -name "*.js" -o -name "*.css" | xargs wc -l
   technologies: [
     { name: "React", version: "18.3.1", logo: "⚛️" },
     { name: "Vite", version: "5.4.11", logo: "⚡" },
