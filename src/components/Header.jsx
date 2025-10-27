@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FaSun, FaMoon, FaCode, FaUser } from 'react-icons/fa';
+import logo from '../assets/Img/logo.png';
 
 /**
  * Composant Header - Barre de navigation avec toggle pour basculer entre les faces
@@ -46,7 +47,7 @@ const Header = ({ isDevMode, toggleMode }) => {
               </span>
             ) : (
               <img
-                src="src/assets/Img/logo.png"
+                src={logo}
                 alt="Logo Jean-David"
                 className="h-12 sm:h-16 md:h-20 w-auto object-contain"
               />

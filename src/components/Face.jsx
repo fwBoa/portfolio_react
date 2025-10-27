@@ -4,6 +4,7 @@ import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaTimes } from 'react-icon
 import emailjs from '@emailjs/browser';
 import ProjectCard from './ProjectCard';
 import { projects } from '../data/projects';
+import avatar from '../assets/Img/avatarportfoliobackgroundremove.png';
 
 /**
  * Composant Face - Version normale du portfolio pour les recruteurs
@@ -70,7 +71,7 @@ const Face = () => {
             >
               <div className="w-48 h-58">
                 <img
-                  src="src/assets/Img/avatarportfoliobackgroundremove.png"
+                  src={avatar}
                   alt="Jean-David"
                   className="w-full h-full object-cover"
                 />
