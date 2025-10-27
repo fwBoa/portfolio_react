@@ -5,11 +5,11 @@ export const techStats = {
   components: 12,
   linesOfCode: 1936, // Calculé avec: find src -name "*.jsx" -o -name "*.js" -o -name "*.css" | xargs wc -l
   technologies: [
-    { name: "React", version: "18.3.1", logo: "⚛️" },
-    { name: "Vite", version: "5.4.11", logo: "⚡" },
-    { name: "TailwindCSS", version: "3.4.16", logo: "🎨" },
-    { name: "Framer Motion", version: "11.18.0", logo: "🎬" },
-    { name: "Prism.js", version: "1.29.0", logo: "📝" },
+    { name: "React", logo: "⚛️" },
+    { name: "Vite", logo: "⚡" },
+    { name: "TailwindCSS", logo: "🎨" },
+    { name: "Framer Motion", logo: "🎬" },
+    { name: "Prism.js", logo: "📝" },
   ],
 };
 
