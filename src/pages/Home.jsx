@@ -34,6 +34,14 @@ const Home = () => {
     localStorage.setItem('devMode', JSON.stringify(!isDevMode));
   };
 
+  // Scroll en haut de la page quand on change de mode
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'instant' // Changé de 'smooth' à 'instant' pour un scroll immédiat
+    });
+  }, [isDevMode]);
+
   // Charge la préférence au montage
   useEffect(() => {
     const savedMode = localStorage.getItem('devMode');
