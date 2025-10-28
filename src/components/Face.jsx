@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaTimes } from 'react-icons/fa';
+import { FaGithub, FaLinkedin, FaTwitter, FaEnvelope, FaTimes, FaDownload } from 'react-icons/fa';
 import emailjs from '@emailjs/browser';
 import ProjectCard from './ProjectCard';
 import { projects } from '../data/projects';
 import avatar from '../assets/Img/avatarportfoliobackgroundremove.png';
+import cv from '../assets/doc/cv_alternance.pdf';
 
 /**
  * Composant Face - Version normale du portfolio pour les recruteurs
@@ -87,10 +88,24 @@ const Face = () => {
                 Développeur web
               </h2>
               <p className="text-lg text-gray-700 leading-relaxed mb-6">
-               Passionné par le web et les nouvelles technologies, j’aime donner vie à des idées à travers le code.
-               Chaque projet est pour moi une nouvelle occasion d’apprendre, d’expérimenter et de concevoir 
-               des solutions modernes et centrées sur l’utilisateur.
+               Passionné par le web et les nouvelles technologies, j'aime donner vie à des idées à travers le code.
+               Chaque projet est pour moi une nouvelle occasion d'apprendre, d'expérimenter et de concevoir 
+               des solutions modernes et centrées sur l'utilisateur.
               </p>
+
+              {/* Bouton télécharger CV */}
+              <div className="mb-6">
+                <motion.a
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  href={cv}
+                  download="CV_Jean-David_Zamblezie.pdf"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-minimal-text text-white rounded-lg hover:bg-[#2a5159] transition-colors font-medium shadow-md"
+                >
+                  <FaDownload size={18} />
+                  Télécharger mon CV
+                </motion.a>
+              </div>
 
               {/* Liens sociaux */}
               <div className="flex gap-4 justify-center md:justify-start">
@@ -312,15 +327,15 @@ const Face = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
               transition={{ type: 'spring', duration: 0.5 }}
-              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
               onClick={() => setShowLegalModal(false)}
             >
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden"
+                className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full my-8 overflow-hidden"
               >
-                {/* Header */}
-                <div className="bg-minimal-text text-white px-6 py-4 flex items-center justify-between">
+                {/* Header fixe */}
+                <div className="bg-minimal-text text-white px-6 py-4 flex items-center justify-between sticky top-0 z-10">
                   <h2 className="text-2xl font-bold">Mentions légales</h2>
                   <motion.button
                     whileHover={{ scale: 1.1, rotate: 90 }}
@@ -333,8 +348,8 @@ const Face = () => {
                   </motion.button>
                 </div>
 
-                {/* Contenu */}
-                <div className="px-6 py-6 overflow-y-auto max-h-[calc(90vh-80px)]">
+                {/* Contenu scrollable */}
+                <div className="px-6 py-8 overflow-y-auto max-h-[70vh]">
                   <div className="space-y-6 text-gray-700">
                     {/* Éditeur */}
                     <div>
@@ -445,13 +460,13 @@ const Face = () => {
                   </div>
                 </div>
 
-                {/* Footer du modal */}
-                <div className="bg-gray-50 px-6 py-4 flex justify-end">
+                {/* Footer fixe du modal */}
+                <div className="bg-gray-50 px-6 py-4 flex justify-end sticky bottom-0 border-t border-gray-200">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowLegalModal(false)}
-                    className="px-6 py-2 bg-minimal-text text-white rounded-lg hover:bg-[#2a5159] transition-colors"
+                    className="px-8 py-3 bg-minimal-text text-white rounded-lg hover:bg-[#2a5159] transition-colors font-medium"
                   >
                     Fermer
                   </motion.button>
