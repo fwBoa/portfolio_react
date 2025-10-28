@@ -150,13 +150,17 @@ Vous êtes un vrai gamer 🎮
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isDevMode]);
 
-  // Message de bienvenue dans la console
+  // Message de bienvenue dans la console (s'affiche une seule fois)
   useEffect(() => {
-    console.log(`
+    // Vérifier si le message a déjà été affiché
+    if (!window.portfolioWelcomeDisplayed) {
+      console.log(`
 %c
 Bienvenue dans mon portfolio !
-j'ai laissé pas mal de messages d'easter eggs dans la console et aussi directement sur le site. n'hesite pas à me contacter si tu en découvres un ou plusieurs !
+j'ai laissé pas mal d'easter eggs dans la console et aussi directement sur le site. N'hésite pas à me contacter si tu en découvres un ou plusieurs !
 `, 'color: #00ff41; font-family: monospace; font-size: 12px;');
+      window.portfolioWelcomeDisplayed = true;
+    }
   }, []);
 
   return (

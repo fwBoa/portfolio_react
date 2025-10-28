@@ -169,18 +169,7 @@ const Face = () => {
               delay={index * 0.1}
             />
           ))}
-        </div>
-
-        {/* Bouton voir tous les projets */}
-        <div className="text-center mt-12">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 bg-minimal-text text-white rounded-lg hover:bg-[#2a5159] transition-colors text-lg font-medium"
-          >
-            Voir tous les projets
-          </motion.button>
-        </div>
+        </div>      
       </motion.section>
 
       {/* Section Contact */}

@@ -23,5 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# Developer documentation (internal use only)
-DEVELOPERS.js
+# Fichiers personnels de développement
+git.txt
+TODO.md
+
