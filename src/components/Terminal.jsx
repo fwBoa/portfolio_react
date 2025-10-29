@@ -7,7 +7,6 @@ import { terminalCommands } from '../data/stats';
  */
 const Terminal = () => {
   const [history, setHistory] = useState([
-    { type: 'output', content: 'Portfolio v1.0.0' },
     { type: 'output', content: 'Tapez "help" pour voir les commandes disponibles.' },
   ]);
   const [input, setInput] = useState('');
