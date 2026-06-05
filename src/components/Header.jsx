@@ -37,8 +37,8 @@ const Header = ({ isDevMode, toggleMode }) => {
         isDevMode
           ? 'bg-[#0a0a0a] border-[#222] text-[#00ff41]'
           : scrolled
-            ? 'bg-white/95 backdrop-blur-md border-neutral-100 text-black'
-            : 'bg-white/80 backdrop-blur-sm border-transparent text-black'
+            ? 'bg-white/95 backdrop-blur-md border-os-border text-os-text'
+            : 'bg-white/80 backdrop-blur-sm border-transparent text-os-text'
       }`}
     >
       {/* Logo */}
@@ -46,39 +46,39 @@ const Header = ({ isDevMode, toggleMode }) => {
         <img
           src={logo}
           alt="Logo Jean-David Zamblezie"
-          className="h-9 w-auto object-contain"
+          className="h-14 sm:h-16 w-auto object-contain"
         />
       </div>
 
-      {/* Nav — editorial with animated underline */}
+      {/* Nav */}
       <nav className="hidden md:flex items-center gap-10">
         {navLinks.map((link) => (
           <button
             key={link.id}
             onClick={() => scrollToSection(link.id)}
-            className={`group relative text-[11px] uppercase tracking-[0.2em] font-medium transition-colors duration-300 ${
+            className={`group relative text-[11px] uppercase tracking-[0.2em] font-medium font-display transition-colors duration-300 ${
               isDevMode
                 ? 'text-neutral-500 hover:text-[#00ff41]'
-                : 'text-neutral-400 hover:text-black'
+                : 'text-os-muted hover:text-os-text'
             }`}
           >
             {link.label}
             <span className={`absolute -bottom-1 left-0 h-px w-0 group-hover:w-full transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${
-              isDevMode ? 'bg-[#00ff41]' : 'bg-black'
+              isDevMode ? 'bg-[#00ff41]' : 'bg-os-text'
             }`} />
           </button>
         ))}
       </nav>
 
-      {/* Dev Toggle — minimal pill */}
+      {/* Dev Toggle */}
       <motion.button
         whileHover={{ scale: 1.04 }}
         whileTap={{ scale: 0.96 }}
         onClick={toggleMode}
-        className={`flex items-center gap-2 px-4 py-2 rounded-full border text-[10px] uppercase tracking-[0.15em] font-medium transition-all duration-300 ${
+        className={`flex items-center gap-2 px-4 py-2 rounded-full border text-[10px] uppercase tracking-[0.15em] font-medium font-display transition-all duration-300 ${
           isDevMode
             ? 'border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black'
-            : 'border-neutral-200 text-neutral-500 hover:border-black hover:text-black hover:bg-black hover:text-white'
+            : 'border-os-border text-os-muted hover:border-os-text hover:text-os-text hover:bg-os-text hover:text-white'
         }`}
       >
         {isDevMode ? (
@@ -89,7 +89,7 @@ const Header = ({ isDevMode, toggleMode }) => {
         ) : (
           <>
             <FaUser size={11} />
-            <span>Human</span>
+            <span>Switch</span>
           </>
         )}
       </motion.button>

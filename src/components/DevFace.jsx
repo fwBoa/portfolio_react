@@ -54,7 +54,7 @@ const DevFace = () => {
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
           className="mb-10 sm:mb-14 lg:mb-20"
         >
-          <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium">
+          <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display">
             Web Developer · AI Automation · Agentic Engineer
           </span>
         </motion.div>
@@ -90,7 +90,7 @@ const DevFace = () => {
           <div className="space-y-10 sm:space-y-14">
             {/* Stats */}
             <motion.div variants={itemVariants}>
-              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium block mb-4 sm:mb-6">
+              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
                 System Info
               </span>
               <div className="space-y-3">
@@ -109,7 +109,7 @@ const DevFace = () => {
 
             {/* Skill groups */}
             <motion.div variants={itemVariants}>
-              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium block mb-4 sm:mb-6">
+              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
                 Capabilities
               </span>
               {skillGroups.map((group) => (
@@ -130,7 +130,7 @@ const DevFace = () => {
 
             {/* Contact links */}
             <motion.div variants={itemVariants}>
-              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium block mb-4 sm:mb-6">
+              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
                 Contact
               </span>
               <div className="space-y-2">

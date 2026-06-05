@@ -7,13 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        // OS Monochrome — Normal Face
+        // OS Teal — Normal Face (ancienne palette bleue sarcelle)
         'os-bg': '#ffffff',
-        'os-surface': '#f5f5f5',
-        'os-border': '#e5e5e5',
-        'os-text': '#000000',
-        'os-muted': '#737373',
-        // Dev Face — Terminal (only color on the site)
+        'os-surface': '#f0f5f5',
+        'os-border': '#d0e0e0',
+        'os-text': '#2d6b6b',
+        'os-muted': '#6b9e9e',
+        // Dev Face — Terminal (only green on the site)
         'dev-bg': '#0a0a0a',
         'dev-surface': '#111111',
         'dev-border': '#222222',
@@ -23,7 +23,9 @@ export default {
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'mono': ['JetBrains Mono', 'Monaco', 'Courier New', 'monospace'],
+        'serif': ['"Playfair Display"', 'Georgia', 'serif'],
+        'mono': ['"JetBrains Mono"', 'Monaco', 'Courier New', 'monospace'],
+        'display': ['"Syne"', 'system-ui', 'sans-serif'],
       },
     },
   },
