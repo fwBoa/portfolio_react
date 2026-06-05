@@ -7,13 +7,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        'dev-dark': '#0a0a0a',
-        'dev-accent': '#00ff41',
-        'minimal-bg': '#ffffff',      // ← Fond blanc (au lieu de '#f8f9fa')
-        'minimal-text': '#376974',    // ← Votre nouvelle couleur (au lieu de '#2c3e50') 
+        // OS Monochrome — Normal Face
+        'os-bg': '#ffffff',
+        'os-surface': '#f5f5f5',
+        'os-border': '#e5e5e5',
+        'os-text': '#000000',
+        'os-muted': '#737373',
+        // Dev Face — Terminal (only color on the site)
+        'dev-bg': '#0a0a0a',
+        'dev-surface': '#111111',
+        'dev-border': '#222222',
+        'dev-text': '#e5e5e5',
+        'dev-muted': '#666666',
+        'dev-green': '#00ff41',
       },
       fontFamily: {
-        'mono': ['Monaco', 'Courier New', 'monospace'],
+        'sans': ['Inter', 'system-ui', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'Monaco', 'Courier New', 'monospace'],
       },
     },
   },

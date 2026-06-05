@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { terminalCommands } from '../data/stats';
+import { terminalCommands } from '../../data/stats';
 
-/**
- * Composant Terminal - Terminal interactif pour le mode développeur
- */
 const Terminal = () => {
   const [history, setHistory] = useState([
-    { type: 'output', content: 'Tapez "help" pour voir les commandes disponibles.' },
+    { type: 'output', content: 'Portfolio OS Terminal [v2.0]\nType "help" for available commands.' },
   ]);
   const [input, setInput] = useState('');
   const [commandHistory, setCommandHistory] = useState([]);
@@ -15,61 +12,47 @@ const Terminal = () => {
   const inputRef = useRef(null);
   const terminalRef = useRef(null);
 
-  // Auto-scroll vers le bas
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [history]);
 
-  // Focus sur l'input au clic
   const handleTerminalClick = () => {
     inputRef.current?.focus();
   };
 
-  // Traitement des commandes
   const executeCommand = (cmd) => {
     const trimmedCmd = cmd.trim().toLowerCase();
-    
-    // Ajoute la commande à l'historique
-    setHistory(prev => [...prev, { type: 'input', content: `$ ${cmd}` }]);
+    setHistory((prev) => [...prev, { type: 'input', content: `$ ${cmd}` }]);
 
-    if (!trimmedCmd) {
-      return;
-    }
+    if (!trimmedCmd) return;
+    setCommandHistory((prev) => [...prev, cmd]);
 
-    // Ajoute à l'historique des commandes
-    setCommandHistory(prev => [...prev, cmd]);
-
-    // Commande clear
     if (trimmedCmd === 'clear') {
       setHistory([]);
       return;
     }
 
-    // Recherche la commande
-    const command = terminalCommands[trimmedCmd];
-    
-    if (command) {
+    if (trimmedCmd === 'neofetch') {
+      setHistory((prev) => [...prev, {
+        type: 'output',
+        content: `OS: Portfolio OS\nHost: Jean-David Zamblezie\nKernel: React + Vite\nUptime: Forever\nShell: zsh\nWM: Framer Motion\nTheme: Cyberpunk\n\nSkills:\n  Web: React, Next.js, TypeScript\n  AI: Python, LangChain, OpenAI\n  Tools: Git, Docker, Vercel`
+      }]);
+      return;
+    }
 
-      // Commande normale
-      setHistory(prev => [
-        ...prev,
-        { type: 'output', content: command.output }
-      ]);
+    const command = terminalCommands[trimmedCmd];
+    if (command) {
+      setHistory((prev) => [...prev, { type: 'output', content: command.output }]);
     } else {
-      // Commande inconnue
-      setHistory(prev => [
-        ...prev,
-        {
-          type: 'error',
-          content: `Command not found: ${trimmedCmd}. Type "help" for available commands.`
-        }
-      ]);
+      setHistory((prev) => [...prev, {
+        type: 'error',
+        content: `Command not found: ${trimmedCmd}. Type "help" for available commands.`
+      }]);
     }
   };
 
-  // Gestion de la soumission
   const handleSubmit = (e) => {
     e.preventDefault();
     executeCommand(input);
@@ -77,7 +60,6 @@ const Terminal = () => {
     setHistoryIndex(-1);
   };
 
-  // Navigation dans l'historique avec les flèches
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowUp') {
       e.preventDefault();
@@ -98,6 +80,13 @@ const Terminal = () => {
         setHistoryIndex(-1);
         setInput('');
       }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      const commands = Object.keys(terminalCommands);
+      const match = commands.find((cmd) => cmd.startsWith(input.toLowerCase()));
+      if (match && match !== input.toLowerCase()) {
+        setInput(match);
+      }
     }
   };
 
@@ -105,56 +94,53 @@ const Terminal = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-[#0a0a0a] rounded-lg border border-dev-accent/30 overflow-hidden shadow-2xl"
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="bg-dev-surface rounded-lg border border-dev-border overflow-hidden"
       onClick={handleTerminalClick}
     >
-      {/* Header du terminal */}
-      <div className="bg-[#1a1a1a] px-4 py-2 flex items-center gap-2 border-b border-dev-accent/30">
-        <span className="w-3 h-3 rounded-full bg-red-500"></span>
-        <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
-        <span className="w-3 h-3 rounded-full bg-green-500"></span>
-        <span className="ml-4 text-dev-accent font-mono text-sm">
-          jean-david@portfolio:~
+      {/* Window chrome */}
+      <div className="bg-dev-bg px-4 py-2.5 flex items-center gap-2 border-b border-dev-border">
+        <span className="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
+        <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70"></span>
+        <span className="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
+        <span className="ml-3 text-dev-muted text-xs font-mono">
+          jean-david@portfolio:~ — zsh
         </span>
       </div>
 
-      {/* Contenu du terminal */}
+      {/* Terminal body */}
       <div
         ref={terminalRef}
-        className="h-96 overflow-y-auto dev-scrollbar p-4 font-mono text-sm"
+        className="h-80 sm:h-96 overflow-y-auto dev-scrollbar p-4 font-mono text-sm"
       >
         {history.map((entry, index) => (
-          <div key={index} className="mb-2">
+          <div key={index} className="mb-1.5">
             {entry.type === 'input' && (
-              <div className="text-dev-accent">{entry.content}</div>
+              <div className="text-dev-green">{entry.content}</div>
             )}
             {entry.type === 'output' && (
-              <div className="text-gray-300 whitespace-pre-wrap">{entry.content}</div>
+              <div className="text-dev-text whitespace-pre-wrap">{entry.content}</div>
             )}
             {entry.type === 'error' && (
               <div className="text-red-400">{entry.content}</div>
             )}
-            {entry.type === 'info' && (
-              <div className="text-yellow-400">{entry.content}</div>
-            )}
           </div>
         ))}
 
-        {/* Input line */}
-        <form onSubmit={handleSubmit} className="flex items-center gap-2">
-          <span className="text-dev-accent">$</span>
+        <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-1">
+          <span className="text-dev-green shrink-0">$</span>
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-gray-300 outline-none caret-dev-accent"
+            className="flex-1 bg-transparent text-dev-text outline-none caret-dev-green"
             autoFocus
             spellCheck="false"
+            autoComplete="off"
           />
-          <span className="text-dev-accent cursor-blink">▊</span>
+          <span className="text-dev-green animate-blink">▊</span>
         </form>
       </div>
     </motion.div>
