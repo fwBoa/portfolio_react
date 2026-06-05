@@ -4,7 +4,7 @@ import { terminalCommands } from '../../data/stats';
 
 const Terminal = () => {
   const [history, setHistory] = useState([
-    { type: 'output', content: 'Portfolio OS Terminal [v2.0]\nType "help" for available commands.' },
+    { type: 'output', content: 'Prometheus OS Terminal [v2.0]\nType "help" for available commands.' },
   ]);
   const [input, setInput] = useState('');
   const [commandHistory, setCommandHistory] = useState([]);
@@ -37,7 +37,7 @@ const Terminal = () => {
     if (trimmedCmd === 'neofetch') {
       setHistory((prev) => [...prev, {
         type: 'output',
-        content: `OS: Portfolio OS\nHost: Jean-David Zamblezie\nKernel: React + Vite\nUptime: Forever\nShell: zsh\nWM: Framer Motion\nTheme: Cyberpunk\n\nSkills:\n  Web: React, Next.js, TypeScript\n  AI: Python, LangChain, OpenAI\n  Tools: Git, Docker, Vercel`
+        content: `OS: Prometheus OS\nHost: Jean-David Zamblezie\nKernel: React + Vite\nUptime: Forever\nShell: zsh\nWM: Framer Motion\nTheme: Cyberpunk\n\nSkills:\n  Web: React, Next.js, TypeScript\n  AI: Python, LangChain, OpenAI\n  Tools: Git, Docker, Vercel`
       }]);
       return;
     }
@@ -48,7 +48,7 @@ const Terminal = () => {
     } else {
       setHistory((prev) => [...prev, {
         type: 'error',
-        content: `Command not found: ${trimmedCmd}. Type "help" for available commands.`
+        content: `Command not found: ${trimmedCmd}. Type "help" for available commands.`,
       }]);
     }
   };
@@ -94,24 +94,22 @@ const Terminal = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-      className="bg-dev-surface rounded-lg border border-dev-border overflow-hidden"
+      transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      className="border border-dev-border overflow-hidden rounded-lg"
       onClick={handleTerminalClick}
     >
-      {/* Window chrome */}
-      <div className="bg-dev-bg px-4 py-2.5 flex items-center gap-2 border-b border-dev-border">
-        <span className="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
-        <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/70"></span>
-        <span className="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
-        <span className="ml-3 text-dev-muted text-xs font-mono">
+      {/* Minimal chrome bar */}
+      <div className="bg-dev-surface px-4 py-2.5 flex items-center justify-between border-b border-dev-border">
+        <span className="text-[10px] sm:text-xs text-dev-muted font-mono tracking-wider">
           jean-david@portfolio:~ — zsh
         </span>
+        <span className="w-2 h-2 rounded-full bg-dev-green/60" />
       </div>
 
       {/* Terminal body */}
       <div
         ref={terminalRef}
-        className="h-80 sm:h-96 overflow-y-auto dev-scrollbar p-4 font-mono text-sm"
+        className="h-64 sm:h-72 lg:h-80 overflow-y-auto dev-scrollbar p-3 sm:p-4 font-mono text-xs sm:text-sm bg-dev-bg"
       >
         {history.map((entry, index) => (
           <div key={index} className="mb-1.5">
@@ -128,19 +126,19 @@ const Terminal = () => {
         ))}
 
         <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-1">
-          <span className="text-dev-green shrink-0">$</span>
+          <span className="text-dev-green shrink-0 text-xs sm:text-sm">$</span>
           <input
             ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-dev-text outline-none caret-dev-green"
+            className="flex-1 bg-transparent text-dev-text outline-none caret-dev-green text-xs sm:text-sm"
             autoFocus
             spellCheck="false"
             autoComplete="off"
           />
-          <span className="text-dev-green animate-blink">▊</span>
+          <span className="text-dev-green animate-blink text-xs sm:text-sm">▊</span>
         </form>
       </div>
     </motion.div>

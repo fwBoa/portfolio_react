@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaDownload, FaTimes } from 'react-icons/fa';
 import avatar from '../assets/Img/avatarportfoliobackgroundremove.png';
 import cv from '../assets/doc/cv_alternance.pdf';
@@ -48,414 +49,406 @@ const legalContent = [
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
+const revealUp = {
+  hidden: { opacity: 0, y: 60 },
+  visible: (i) => ({
     opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+    y: 0,
+    transition: { duration: 0.9, delay: i * 0.12, ease: [0.25, 0.1, 0.25, 1] },
+  }),
+};
+
+const lineReveal = {
+  hidden: { scaleX: 0 },
+  visible: {
+    scaleX: 1,
+    transition: { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] },
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
+const letterVariants = {
+  hidden: { y: '110%', opacity: 0 },
+  visible: (i) => ({
+    y: '0%',
     opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
+    transition: { duration: 0.7, delay: i * 0.03, ease: [0.25, 0.1, 0.25, 1] },
+  }),
 };
+
+const AnimatedLetters = ({ text, className, delayOffset = 0 }) => (
+  <span className={`${className} inline-block overflow-hidden`}>
+    {text.split('').map((char, i) => (
+      <motion.span
+        key={`${char}-${i}`}
+        custom={i + delayOffset}
+        initial="hidden"
+        animate="visible"
+        variants={letterVariants}
+        className="inline-block"
+        style={{ whiteSpace: char === ' ' ? 'pre' : undefined }}
+      >
+        {char === ' ' ? ' ' : char}
+      </motion.span>
+    ))}
+  </span>
+);
 
 const Face = () => {
   const [showLegal, setShowLegal] = useState(false);
 
+  // Parallax for avatar
+  const { scrollY } = useScroll();
+  const rawAvatarY = useTransform(scrollY, [0, 800], [0, -50]);
+  const avatarY = useSpring(rawAvatarY, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
   return (
-    <div className="min-h-screen bg-white text-black pt-20">
-      {/* ===== HERO ===== */}
-      <section id="about" className="px-6 sm:px-12 lg:px-24 py-20 sm:py-32 lg:py-40">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-16 lg:gap-24 items-start">
-            {/* Text */}
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="order-2 lg:order-1"
-            >
-              <motion.p
-                variants={itemVariants}
-                className="text-neutral-400 text-xs sm:text-sm tracking-[0.25em] uppercase mb-8"
-              >
-                Web Developer · AI Automation · Agentic Engineer
-              </motion.p>
+    <div className="min-h-screen bg-white text-black pt-20 overflow-x-hidden">
+      {/* Grain texture overlay */}
+      <div className="grain-overlay" />
 
-              <motion.h1
-                variants={itemVariants}
-                className="text-[clamp(3rem,8vw,6.5rem)] font-bold leading-[0.95] tracking-[-0.03em] mb-10"
-              >
-                Jean-David
-                <br />
-                Zamblezie
-              </motion.h1>
+      {/* ===== HERO — EDITORIAL FASHION ===== */}
+      <section id="about" className="relative px-5 sm:px-10 lg:px-20 xl:px-24 pt-12 sm:pt-16 pb-20 sm:pb-32 lg:pb-48">
+        <div className="max-w-[1400px] mx-auto relative">
 
-              <motion.p
-                variants={itemVariants}
-                className="text-neutral-500 text-base sm:text-lg max-w-md leading-[1.7] mb-12"
-              >
-                Développeur web spécialisé en automatisation IA et ingénierie
-                agentique. Applications modernes avec React, Next.js et
-                TypeScript.
-              </motion.p>
-
-              <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-5">
-                <a
-                  href={cv}
-                  download="CV_Jean-David_Zamblezie.pdf"
-                  className="group inline-flex items-center gap-2.5 px-6 py-3 bg-black text-white rounded-lg text-sm font-medium hover:bg-neutral-800 transition-all duration-300"
-                >
-                  <FaDownload size={14} />
-                  <span>Télécharger le CV</span>
-                </a>
-
-                <div className="flex items-center gap-3">
-                  {[
-                    { icon: FaGithub, href: 'https://github.com/fwboa', label: 'GitHub' },
-                    { icon: FaLinkedin, href: 'https://www.linkedin.com/in/jean-david-zamblezie-84410b258/', label: 'LinkedIn' },
-                    { icon: FaEnvelope, href: 'mailto:jeandavidzamblezie@outlook.fr', label: 'Email' },
-                  ].map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={link.label}
-                      className="w-11 h-11 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-400 hover:border-black hover:text-black hover:scale-110 transition-all duration-300"
-                    >
-                      <link.icon size={16} />
-                    </a>
-                  ))}
-                </div>
-              </motion.div>
-            </motion.div>
-
-            {/* Avatar */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="order-1 lg:order-2 flex justify-center lg:justify-end lg:pt-8"
-            >
-              <div className="relative">
-                <img
-                  src={avatar}
-                  alt="Jean-David Zamblezie"
-                  className="w-full max-w-[260px] lg:max-w-[300px] h-auto object-contain"
-                  loading="eager"
-                />
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== SKILLS ===== */}
-      <section id="skills" className="px-6 sm:px-12 lg:px-24 py-32 sm:py-40 border-t border-neutral-100">
-        <div className="max-w-6xl mx-auto">
-          {/* Eyebrow */}
+          {/* Masthead label */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
-            transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
-            className="mb-20"
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+            className="flex justify-between items-start mb-10 sm:mb-16 lg:mb-20"
           >
-            <span className="inline-block rounded-full px-4 py-1.5 text-[10px] uppercase tracking-[0.2em] font-medium bg-neutral-100 text-neutral-500">
-              Expertise
+            <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium">
+              Web Developer · AI Automation · Agentic Engineer
             </span>
           </motion.div>
 
-          {/* Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Card 1: Web — Large, spans 2 rows */}
-            <motion.div
-              initial={{ opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1], delay: 0 }}
-              className="md:row-span-2"
-            >
-              <div className="h-full p-2 bg-neutral-50 rounded-[1.5rem] ring-1 ring-black/[0.04] hover:ring-black/[0.08] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]">
-                <div className="h-full bg-white rounded-[calc(1.5rem-0.5rem)] p-8 sm:p-10 shadow-[inset_0_1px_0_rgba(0,0,0,0.03)] flex flex-col">
-                  <div className="flex items-baseline gap-3 mb-6">
-                    <span className="font-mono text-neutral-300 text-sm">{skills[0].num}</span>
-                    <h3 className="font-bold text-xl sm:text-2xl tracking-tight">{skills[0].title}</h3>
-                  </div>
+          {/* Massive Name + Avatar composition */}
+          <div className="relative">
+            <h1 className="text-[clamp(2.5rem,12vw,13rem)] font-bold leading-[0.85] tracking-[-0.04em]">
+              <AnimatedLetters text="Jean-David" />
+            </h1>
 
-                  <p className="text-neutral-500 leading-[1.7] mb-8 max-w-sm">
-                    {skills[0].desc}
-                  </p>
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 lg:gap-0 mt-1 sm:mt-2 lg:mt-0">
+              <h1 className="text-[clamp(2.5rem,12vw,13rem)] font-bold leading-[0.85] tracking-[-0.04em] lg:text-right lg:ml-auto">
+                <AnimatedLetters text="Zamblezie" delayOffset={12} />
+              </h1>
 
-                  <div className="flex flex-wrap gap-2 mt-auto">
-                    {skills[0].items.map((item) => (
-                      <span
-                        key={item}
-                        className="px-3.5 py-2 text-sm rounded-full bg-neutral-50 text-neutral-600 hover:bg-neutral-100 hover:text-black transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Card 2: AI */}
-            <motion.div
-              initial={{ opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1], delay: 0.1 }}
-            >
-              <div className="h-full p-2 bg-neutral-50 rounded-[1.5rem] ring-1 ring-black/[0.04] hover:ring-black/[0.08] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]">
-                <div className="h-full bg-white rounded-[calc(1.5rem-0.5rem)] p-8 sm:p-10 shadow-[inset_0_1px_0_rgba(0,0,0,0.03)] flex flex-col">
-                  <div className="flex items-baseline gap-3 mb-6">
-                    <span className="font-mono text-neutral-300 text-sm">{skills[1].num}</span>
-                    <h3 className="font-bold text-xl sm:text-2xl tracking-tight">{skills[1].title}</h3>
-                  </div>
-
-                  <p className="text-neutral-500 leading-[1.7] mb-8 max-w-sm">
-                    {skills[1].desc}
-                  </p>
-
-                  <div className="flex flex-wrap gap-2 mt-auto">
-                    {skills[1].items.map((item) => (
-                      <span
-                        key={item}
-                        className="px-3.5 py-2 text-sm rounded-full bg-neutral-50 text-neutral-600 hover:bg-neutral-100 hover:text-black transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Card 3: Infrastructure */}
-            <motion.div
-              initial={{ opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.9, ease: [0.32, 0.72, 0, 1], delay: 0.2 }}
-            >
-              <div className="h-full p-2 bg-neutral-50 rounded-[1.5rem] ring-1 ring-black/[0.04] hover:ring-black/[0.08] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]">
-                <div className="h-full bg-white rounded-[calc(1.5rem-0.5rem)] p-8 sm:p-10 shadow-[inset_0_1px_0_rgba(0,0,0,0.03)] flex flex-col">
-                  <div className="flex items-baseline gap-3 mb-6">
-                    <span className="font-mono text-neutral-300 text-sm">{skills[2].num}</span>
-                    <h3 className="font-bold text-xl sm:text-2xl tracking-tight">{skills[2].title}</h3>
-                  </div>
-
-                  <p className="text-neutral-500 leading-[1.7] mb-8 max-w-sm">
-                    {skills[2].desc}
-                  </p>
-
-                  <div className="flex flex-wrap gap-2 mt-auto">
-                    {skills[2].items.map((item) => (
-                      <span
-                        key={item}
-                        className="px-3.5 py-2 text-sm rounded-full bg-neutral-50 text-neutral-600 hover:bg-neutral-100 hover:text-black transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)]"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              {/* Avatar — floating, offset, fashion editorial style + parallax */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, rotate: -3 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
+                style={{ y: avatarY }}
+                className="lg:absolute lg:bottom-0 lg:left-[3%] xl:left-[6%] flex-shrink-0 self-center lg:self-auto mt-4 lg:mt-0"
+              >
+                <img
+                  src={avatar}
+                  alt="Jean-David Zamblezie"
+                  className="w-32 sm:w-40 md:w-48 lg:w-56 h-auto object-contain max-w-full"
+                  loading="eager"
+                />
+              </motion.div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* ===== CONTACT ===== */}
-      <section id="contact" className="px-6 sm:px-12 lg:px-24 py-24 sm:py-32 border-t border-neutral-100">
-        <div className="max-w-6xl mx-auto">
+          {/* Bottom hero bar */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.7 }}
+            className="mt-12 sm:mt-16 lg:mt-24 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 sm:gap-8"
           >
-            <p className="text-neutral-300 text-xs tracking-[0.25em] uppercase mb-16">
-              Contact
+            <p className="text-neutral-500 text-xs sm:text-sm lg:text-base max-w-[16rem] sm:max-w-xs leading-relaxed">
+              Développeur web spécialisé en automatisation IA et ingénierie agentique.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-16">
-              {/* Left: CTA */}
-              <div>
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-6">
-                  Travaillons
-                  <br />
-                  ensemble.
-                </h2>
-                <p className="text-neutral-500 leading-[1.7] max-w-sm">
-                  Vous avez un projet, une opportunité, ou juste envie d'échanger ?
-                  Je suis toujours ouvert aux nouvelles collaborations.
-                </p>
-              </div>
-
-              {/* Right: Links */}
-              <div className="space-y-6">
-                {[
-                  {
-                    icon: FaEnvelope,
-                    href: 'mailto:jeandavidzamblezie@outlook.fr',
-                    label: 'jeandavidzamblezie@outlook.fr',
-                  },
-                  {
-                    icon: FaGithub,
-                    href: 'https://github.com/fwboa',
-                    label: 'github.com/fwboa',
-                    external: true,
-                  },
-                  {
-                    icon: FaLinkedin,
-                    href: 'https://www.linkedin.com/in/jean-david-zamblezie-84410b258/',
-                    label: 'linkedin.com/in/jean-david-zamblezie',
-                    external: true,
-                  },
-                ].map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    target={link.external ? '_blank' : undefined}
-                    rel={link.external ? 'noopener noreferrer' : undefined}
-                    className="group flex items-center gap-4 py-3"
-                  >
-                    <span className="w-12 h-12 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-400 group-hover:border-black group-hover:text-black transition-all duration-300">
-                      <link.icon size={18} />
-                    </span>
-                    <div className="flex-1">
-                      <span className="text-neutral-600 group-hover:text-black transition-colors duration-300 text-base link-underline">
-                        {link.label}
-                      </span>
-                    </div>
-                    {link.external && (
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="text-neutral-300 group-hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0"
-                      >
-                        <path d="M7 17L17 7" />
-                        <path d="M7 7h10v10" />
-                      </svg>
-                    )}
-                  </a>
-                ))}
-              </div>
+            <div className="flex items-center gap-6">
+              <a
+                href={cv}
+                download="CV_Jean-David_Zamblezie.pdf"
+                className="group flex items-center gap-2.5 sm:gap-3 text-xs sm:text-sm font-medium"
+              >
+                <span className="border-b border-black pb-0.5 group-hover:text-neutral-500 group-hover:border-neutral-500 transition-colors duration-500">
+                  Télécharger le CV
+                </span>
+                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-neutral-200 flex items-center justify-center group-hover:border-black group-hover:bg-black group-hover:text-white transition-all duration-500">
+                  <FaDownload size={11} />
+                </span>
+              </a>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="px-6 sm:px-12 lg:px-24 py-10 border-t border-neutral-100">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium tracking-tight">Jean-David Zamblezie</p>
-            <p className="text-xs text-neutral-400 mt-0.5">
-              Web Developer · AI Automation · Agentic Engineer
-            </p>
-          </div>
+      {/* ===== SKILLS — FASHION EDITORIAL WATERMARKS ===== */}
+      <section id="skills" className="relative">
+        {skills.map((cat, index) => (
+          <div
+            key={cat.num}
+            className="relative px-5 sm:px-10 lg:px-20 xl:px-24 py-16 sm:py-24 lg:py-36"
+          >
+            {/* Line reveal separator */}
+            {index > 0 && (
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.5 }}
+                variants={lineReveal}
+                className="absolute top-0 left-5 sm:left-10 lg:left-20 xl:left-24 right-5 sm:right-10 lg:right-20 xl:right-24 h-px bg-neutral-100 origin-left"
+              />
+            )}
 
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => setShowLegal(true)}
-              className="text-xs text-neutral-400 hover:text-black transition-colors duration-300"
+            {/* Giant watermark number */}
+            <motion.span
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[clamp(6rem,20vw,22rem)] font-bold text-neutral-100 select-none pointer-events-none leading-none"
             >
-              Mentions légales
-            </button>
-            <span className="text-xs text-neutral-300">© {new Date().getFullYear()}</span>
+              {cat.num}
+            </motion.span>
+
+            <div className="max-w-[1400px] mx-auto relative z-10">
+              {/* Title + skill tags row */}
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 sm:gap-8 lg:gap-16 items-start">
+                <motion.div
+                  custom={index}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.4 }}
+                  variants={revealUp}
+                >
+                  <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-3 sm:mb-4">
+                    {cat.num} — Compétences
+                  </span>
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight leading-tight">
+                    {cat.title}
+                  </h2>
+                </motion.div>
+
+                <motion.div
+                  custom={index + 1}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.4 }}
+                  variants={revealUp}
+                  className="lg:pt-10"
+                >
+                  <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-1.5 sm:gap-y-2">
+                    {cat.items.map((item, i) => (
+                      <span key={item} className="text-xs sm:text-sm lg:text-base text-neutral-600">
+                        {item}
+                        {i < cat.items.length - 1 && (
+                          <span className="text-neutral-300 ml-4 sm:ml-6">·</span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Description */}
+              <motion.p
+                custom={index + 2}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.4 }}
+                variants={revealUp}
+                className="mt-8 sm:mt-12 lg:mt-16 text-neutral-500 text-xs sm:text-sm lg:text-base max-w-xl leading-[1.8]"
+              >
+                {cat.desc}
+              </motion.p>
+            </div>
           </div>
+        ))}
+      </section>
+
+      {/* Line reveal before contact */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.5 }}
+        variants={lineReveal}
+        className="mx-5 sm:mx-10 lg:mx-20 xl:mx-24 h-px bg-neutral-100 origin-left"
+      />
+
+      {/* ===== CONTACT — EDITORIAL ===== */}
+      <section id="contact" className="px-5 sm:px-10 lg:px-20 xl:px-24 py-20 sm:py-28 lg:py-40 xl:py-48">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-12 sm:gap-16 lg:gap-24">
+            {/* Left */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-neutral-400 font-medium block mb-5 sm:mb-6">
+                Contact
+              </span>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight leading-[1.05] mb-6 sm:mb-8">
+                Travaillons
+                <br />
+                ensemble.
+              </h2>
+              <p className="text-neutral-500 text-xs sm:text-sm lg:text-base leading-relaxed max-w-sm">
+                Vous avez un projet, une opportunité, ou juste envie d'échanger ?
+                Je suis toujours ouvert aux nouvelles collaborations.
+              </p>
+            </motion.div>
+
+            {/* Right — Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.15 }}
+              className="lg:pt-16 space-y-6 sm:space-y-8"
+            >
+              {[
+                {
+                  label: 'Email',
+                  value: 'jeandavidzamblezie@outlook.fr',
+                  href: 'mailto:jeandavidzamblezie@outlook.fr',
+                  icon: FaEnvelope,
+                },
+                {
+                  label: 'GitHub',
+                  value: 'github.com/fwboa',
+                  href: 'https://github.com/fwboa',
+                  icon: FaGithub,
+                  external: true,
+                },
+                {
+                  label: 'LinkedIn',
+                  value: 'linkedin.com/in/jean-david-zamblezie',
+                  href: 'https://www.linkedin.com/in/jean-david-zamblezie-84410b258/',
+                  icon: FaLinkedin,
+                  external: true,
+                },
+              ].map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target={link.external ? '_blank' : undefined}
+                  rel={link.external ? 'noopener noreferrer' : undefined}
+                  className="group flex items-center gap-3 sm:gap-4 py-2.5 sm:py-3"
+                >
+                  <link.icon
+                    size={16}
+                    className="text-neutral-300 group-hover:text-black transition-colors duration-500 sm:w-[18px] sm:h-[18px]"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-[10px] sm:text-xs text-neutral-400 uppercase tracking-wider block mb-0.5">
+                      {link.label}
+                    </span>
+                    <span className="text-base sm:text-lg lg:text-xl text-neutral-800 group-hover:text-black transition-colors duration-500 border-b border-transparent group-hover:border-black pb-0.5 truncate block">
+                      {link.value}
+                    </span>
+                  </div>
+                  {link.external && (
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      className="text-neutral-300 group-hover:text-black transition-all duration-500 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 flex-shrink-0"
+                    >
+                      <path d="M7 17L17 7" />
+                      <path d="M7 7h10v10" />
+                    </svg>
+                  )}
+                </a>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="px-5 sm:px-10 lg:px-20 xl:px-24 py-6 sm:py-8 border-t border-neutral-100">
+        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <p className="text-[10px] sm:text-xs text-neutral-400 tracking-wider">
+            © {new Date().getFullYear()} Jean-David Zamblezie
+          </p>
+          <button
+            onClick={() => setShowLegal(true)}
+            className="text-[10px] sm:text-xs text-neutral-400 hover:text-black transition-colors duration-500 tracking-wider"
+          >
+            Mentions légales
+          </button>
         </div>
       </footer>
 
-      {/* ===== LEGAL MODAL ===== */}
-      <AnimatePresence>
-        {showLegal && (
-          <>
+      {/* ===== LEGAL MODAL — Portal ===== */}
+      {createPortal(
+        <AnimatePresence>
+          {showLegal && (
             <motion.div
+              key="legal-modal"
+              className="fixed inset-0 z-[9999]"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              onClick={() => setShowLegal(false)}
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[60]"
-            />
-
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.98 }}
-              transition={{ type: 'spring', damping: 30, stiffness: 350 }}
-              className="fixed inset-4 sm:inset-auto sm:top-24 sm:left-1/2 sm:-translate-x-1/2 sm:w-full sm:max-w-2xl z-[70] bg-white border border-black rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
             >
-              {/* Modal Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
-                <span className="text-xs text-neutral-400 font-mono tracking-wider">
-                  MENTIONS LÉGALES
-                </span>
-                <button
-                  onClick={() => setShowLegal(false)}
-                  className="w-9 h-9 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-400 hover:border-black hover:text-black transition-all duration-300"
-                >
-                  <FaTimes size={14} />
-                </button>
-              </div>
+              <div
+                onClick={() => setShowLegal(false)}
+                className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+              />
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 40 }}
+                transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                className="absolute inset-3 sm:inset-6 lg:inset-auto lg:top-20 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-2xl bg-white border border-black rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh]"
+              >
+                <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-neutral-100">
+                  <span className="text-[10px] sm:text-xs text-neutral-400 font-medium tracking-wider uppercase">
+                    Mentions légales
+                  </span>
+                  <button
+                    onClick={() => setShowLegal(false)}
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-neutral-200 flex items-center justify-center text-neutral-400 hover:border-black hover:text-black transition-all duration-300"
+                  >
+                    <FaTimes size={13} />
+                  </button>
+                </div>
 
-              {/* Modal Content */}
-              <div className="flex-1 overflow-y-auto p-6 sm:p-10 space-y-8">
-                {legalContent.map((section) => (
-                  <div key={section.title}>
-                    <h3 className="text-sm font-bold mb-3 flex items-center gap-2">
-                      <span className="text-neutral-300 text-xs">#</span>
-                      {section.title}
-                    </h3>
-                    <p className="text-neutral-500 text-sm leading-relaxed whitespace-pre-line">
-                      {section.body}
+                <div className="flex-1 overflow-y-auto p-5 sm:p-10 space-y-6 sm:space-y-8">
+                  {legalContent.map((section) => (
+                    <div key={section.title}>
+                      <h3 className="text-xs sm:text-sm font-bold mb-2 sm:mb-3">{section.title}</h3>
+                      <p className="text-neutral-500 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+                        {section.body}
+                      </p>
+                    </div>
+                  ))}
+                  <div className="pt-3 sm:pt-4 border-t border-neutral-100">
+                    <p className="text-[10px] sm:text-xs text-neutral-400">
+                      Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                   </div>
-                ))}
-
-                <div className="pt-4 border-t border-neutral-100">
-                  <p className="text-xs text-neutral-400">
-                    Dernière mise à jour :{' '}
-                    {new Date().toLocaleDateString('fr-FR', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
                 </div>
-              </div>
 
-              {/* Modal Footer */}
-              <div className="px-6 py-4 border-t border-neutral-100 flex justify-end">
-                <button
-                  onClick={() => setShowLegal(false)}
-                  className="px-6 py-2.5 bg-black text-white rounded-lg text-sm font-medium hover:bg-neutral-800 transition-colors duration-300"
-                >
-                  Fermer
-                </button>
-              </div>
+                <div className="px-5 sm:px-6 py-3 sm:py-4 border-t border-neutral-100 flex justify-end">
+                  <button
+                    onClick={() => setShowLegal(false)}
+                    className="px-5 sm:px-6 py-2 sm:py-2.5 bg-black text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-neutral-800 transition-colors duration-300"
+                  >
+                    Fermer
+                  </button>
+                </div>
+              </motion.div>
             </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };

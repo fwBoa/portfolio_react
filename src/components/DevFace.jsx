@@ -2,17 +2,71 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Terminal from './dev/Terminal';
 
+const stats = [
+  { label: 'OS', value: 'Prometheus OS' },
+  { label: 'Host', value: 'Jean-David Zamblezie' },
+  { label: 'Kernel', value: 'React + Vite' },
+  { label: 'Shell', value: 'zsh' },
+  { label: 'WM', value: 'Framer Motion' },
+  { label: 'Theme', value: 'Monochrome' },
+];
+
+const skillGroups = [
+  {
+    title: 'Web',
+    items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Vite'],
+  },
+  {
+    title: 'AI',
+    items: ['Python', 'LangChain', 'OpenAI', 'n8n', 'MCP', 'Agents'],
+  },
+  {
+    title: 'Tools',
+    items: ['Git', 'Docker', 'Figma', 'PostgreSQL', 'Supabase', 'Vercel'],
+  },
+];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.2 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] },
+  },
+};
+
 const DevFace = () => {
   return (
-    <div className="min-h-screen bg-dev-bg text-dev-green pt-20 px-4 pb-12 font-mono">
-      <div className="max-w-3xl mx-auto">
+    <div className="min-h-screen bg-dev-bg text-dev-green font-mono pt-20 overflow-x-hidden">
+      <div className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 py-12 sm:py-16 lg:py-20">
+        {/* Masthead */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+          className="mb-10 sm:mb-14 lg:mb-20"
+        >
+          <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium">
+            Web Developer · AI Automation · Agentic Engineer
+          </span>
+        </motion.div>
+
+        {/* ASCII Banner — responsive */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4 }}
-          className="mb-6"
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="mb-10 sm:mb-14 lg:mb-20"
         >
-          <pre className="text-[0.35rem] sm:text-xs md:text-sm text-dev-green leading-none select-none overflow-x-auto"
+          <pre className="text-[0.28rem] sm:text-[0.32rem] md:text-xs lg:text-sm text-dev-green leading-[1.1] select-none overflow-x-auto whitespace-pre"
           >
 {`
      ██╗███████╗ █████╗ ███╗   ██╗      ██████╗  █████╗ ██╗   ██╗██╗██████╗
@@ -23,21 +77,97 @@ const DevFace = () => {
  ╚════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝      ╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝
 `}
           </pre>
-          <p className="text-dev-muted text-xs mt-2 text-center">
-            Web Developer · AI Automation · Agentic Engineer
-          </p>
         </motion.div>
 
-        <Terminal />
+        {/* Main grid — stats left, terminal right on desktop */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr] gap-10 sm:gap-12 lg:gap-16"
+        >
+          {/* Left column — System info */}
+          <div className="space-y-10 sm:space-y-14">
+            {/* Stats */}
+            <motion.div variants={itemVariants}>
+              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium block mb-4 sm:mb-6">
+                System Info
+              </span>
+              <div className="space-y-3">
+                {stats.map((stat) => (
+                  <div key={stat.label} className="flex justify-between items-baseline">
+                    <span className="text-[10px] sm:text-xs text-dev-muted uppercase tracking-wider">
+                      {stat.label}
+                    </span>
+                    <span className="text-xs sm:text-sm text-dev-text font-medium">
+                      {stat.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
 
+            {/* Skill groups */}
+            <motion.div variants={itemVariants}>
+              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium block mb-4 sm:mb-6">
+                Capabilities
+              </span>
+              {skillGroups.map((group) => (
+                <div key={group.title} className="mb-5 sm:mb-6">
+                  <span className="text-[10px] sm:text-xs text-dev-green uppercase tracking-wider block mb-2">
+                    {group.title}
+                  </span>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {group.items.map((item) => (
+                      <span key={item} className="text-[10px] sm:text-xs text-dev-muted">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Contact links */}
+            <motion.div variants={itemVariants}>
+              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium block mb-4 sm:mb-6">
+                Contact
+              </span>
+              <div className="space-y-2">
+                <a href="mailto:jeandavidzamblezie@outlook.fr" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                  jeandavidzamblezie@outlook.fr
+                </a>
+                <a href="https://github.com/fwboa" target="_blank" rel="noopener noreferrer" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                  github.com/fwboa
+                </a>
+                <a href="https://www.linkedin.com/in/jean-david-zamblezie-84410b258/" target="_blank" rel="noopener noreferrer" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                  linkedin.com/in/jean-david-zamblezie
+                </a>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right column — Terminal */}
+          <div>
+            <Terminal />
+          </div>
+        </motion.div>
+
+        {/* Footer */}
         <motion.footer
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-8 text-center text-dev-muted text-xs"
+          transition={{ delay: 1 }}
+          className="mt-16 sm:mt-20 lg:mt-24 pt-6 border-t border-dev-border"
         >
-          <p>jean-david@portfolio:~$ exit</p>
-          <p className="text-dev-green mt-1">logout</p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <span className="text-[10px] sm:text-xs text-dev-muted">
+              © {new Date().getFullYear()} Jean-David Zamblezie
+            </span>
+            <span className="text-[10px] sm:text-xs text-dev-muted">
+              jean-david@portfolio:~$ exit → logout
+            </span>
+          </div>
         </motion.footer>
       </div>
     </div>
