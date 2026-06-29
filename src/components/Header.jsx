@@ -1,251 +1,273 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { FaSun, FaMoon, FaCode, FaUser } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaCode, FaBars, FaTimes } from 'react-icons/fa';
 import logo from '../assets/Img/logo.png';
 
-/**
- * Composant Header - Barre de navigation avec toggle pour basculer entre les faces
- * @param {boolean} isDevMode - État du mode développeur
- * @param {function} toggleMode - Fonction pour basculer entre les modes
- */
 const Header = ({ isDevMode, toggleMode }) => {
-  // Fonction pour le défilement fluide vers une section
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('about');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navLinks = [
+    { label: 'À propos', id: 'about' },
+    { label: 'Compétences', id: 'skills' },
+    { label: 'Contact', id: 'contact' },
+  ];
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40);
+
+      // Scroll spy
+      const sections = navLinks.map((link) => document.getElementById(link.id));
+      const scrollPos = window.scrollY + 150;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        if (sections[i] && sections[i].offsetTop <= scrollPos) {
+          setActiveSection(navLinks[i].id);
+          break;
+        }
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const headerOffset = 120; // Hauteur du header + marge
+      const headerOffset = 80;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
     }
+    setMobileMenuOpen(false);
   };
 
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
-      className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md ${isDevMode
-          ? 'bg-dev-dark/95 border-b-2 border-dev-accent shadow-lg shadow-dev-accent/20'
-          : 'bg-white/95 shadow-lg border-b border-gray-200'
-        } transition-all duration-300`}
-    >
-      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-5">
-        <div className="flex items-center justify-between gap-4">
-          {/* Logo / Nom */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="flex items-center flex-shrink-0 cursor-pointer"
+    <>
+      <motion.header
+        initial={{ y: -40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+          isDevMode
+            ? 'bg-[#0a0a0a]/90 backdrop-blur-md border-b border-[#222]'
+            : scrolled
+              ? 'bg-white/85 backdrop-blur-xl border-b border-os-border/60 shadow-[0_1px_40px_-12px_rgba(0,0,0,0.05)]'
+              : 'bg-transparent border-b border-transparent'
+        }`}
+      >
+        <div className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 flex items-center justify-between h-16 sm:h-[4.5rem] lg:h-20">
+          {/* Logo */}
+          <button
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+              setMobileMenuOpen(false);
+            }}
+            className="flex items-center group"
           >
-            {isDevMode ? (
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-xl sm:text-2xl font-bold text-dev-accent font-mono relative"
-              >
-                {'<JD />'}
-                <motion.span
-                  animate={{ opacity: [0, 1, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  className="inline-block ml-1 text-dev-accent"
-                >
-                  _
-                </motion.span>
-              </motion.span>
-            ) : (
-              <motion.img
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                src={logo}
-                alt="Logo Jean-David"
-                className="h-12 sm:h-16 md:h-20 w-auto object-contain drop-shadow-md"
-              />
-            )}
-          </motion.div>
+            <img
+              src={logo}
+              alt="Logo Jean-David Zamblezie"
+              className="h-12 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+            />
+          </button>
 
-
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center">
             {isDevMode ? (
-              // Navigation mode développeur
-              <>
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => scrollToSection('terminal')}
-                  className="text-dev-accent hover:text-white transition-colors font-mono cursor-pointer text-sm sm:text-base relative group"
-                >
-                  $ terminal
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dev-accent group-hover:w-full transition-all duration-300"></span>
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => scrollToSection('code')}
-                  className="text-dev-accent hover:text-white transition-colors font-mono cursor-pointer text-sm sm:text-base relative group"
-                >
-                  {'{ code }'}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dev-accent group-hover:w-full transition-all duration-300"></span>
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => scrollToSection('stats')}
-                  className="text-dev-accent hover:text-white transition-colors font-mono cursor-pointer text-sm sm:text-base relative group"
-                >
-                  // stats
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-dev-accent group-hover:w-full transition-all duration-300"></span>
-                </motion.button>
-              </>
+              <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.15em] text-dev-muted uppercase">
+                jean-david@portfolio:~$<span className="inline-block w-1.5 h-3.5 bg-dev-green ml-1 align-middle animate-blink" />
+              </span>
             ) : (
-              // Navigation mode normal
-              <>
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => scrollToSection('about')}
-                  className="text-minimal-text hover:text-[#2a5159] transition-colors cursor-pointer font-medium text-sm sm:text-base relative group"
-                >
-                  À propos
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-minimal-text group-hover:w-full transition-all duration-300"></span>
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => scrollToSection('projects')}
-                  className="text-minimal-text hover:text-[#2a5159] transition-colors cursor-pointer font-medium text-sm sm:text-base relative group"
-                >
-                  Projets
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-minimal-text group-hover:w-full transition-all duration-300"></span>
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => scrollToSection('contact')}
-                  className="text-minimal-text hover:text-[#2a5159] transition-colors cursor-pointer font-medium text-sm sm:text-base relative group"
-                >
-                  Contact
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-minimal-text group-hover:w-full transition-all duration-300"></span>
-                </motion.button>
-              </>
+              <div className="flex items-center gap-1">
+                {navLinks.map((link) => {
+                  const isActive = activeSection === link.id;
+                  return (
+                    <button
+                      key={link.id}
+                      onClick={() => scrollToSection(link.id)}
+                      className={`relative px-4 py-2 text-[11px] uppercase tracking-[0.15em] font-medium font-display transition-colors duration-300 rounded-full ${
+                        isActive
+                          ? 'text-os-text'
+                          : 'text-os-muted hover:text-os-text'
+                      }`}
+                    >
+                      {link.label}
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeNav"
+                          className="absolute inset-0 bg-os-surface rounded-full -z-10"
+                          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             )}
           </nav>
 
-          {/* Toggle Button avec label */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <motion.span
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`hidden sm:block text-xs sm:text-sm font-semibold tracking-wide ${
-                isDevMode ? 'text-dev-accent font-mono' : 'text-minimal-text'
-              }`}
-            >
-              {isDevMode ? '< DEV />' : 'NORMAL'}
-            </motion.span>
-            
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={toggleMode}
-              className={`relative w-14 h-7 sm:w-16 sm:h-8 rounded-full p-1 transition-all duration-300 ${
-                isDevMode 
-                  ? 'bg-dev-accent shadow-lg shadow-dev-accent/50' 
-                  : 'bg-gray-300 shadow-md'
-              }`}
-              aria-label="Basculer le mode"
-            >
-              {/* Animation pulsante pour attirer l'attention */}
+          {/* Right: Mobile hamburger + Toggle */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Section indicator dot (desktop only) */}
+            <AnimatePresence mode="wait">
               {!isDevMode && (
-                <motion.div
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.3, 0.6, 0.3],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  className="absolute inset-0 rounded-full bg-minimal-text"
+                <motion.span
+                  key={activeSection}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0 }}
+                  className="hidden lg:block w-1.5 h-1.5 rounded-full bg-os-text"
                 />
               )}
-              
-              <motion.div
-                animate={{ x: isDevMode ? 28 : 0 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                className={`relative w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shadow-lg ${
-                  isDevMode ? 'bg-dev-dark' : 'bg-white'
-                }`}
-              >
-                {isDevMode ? (
-                  <FaCode className="text-dev-accent text-xs sm:text-sm" />
-                ) : (
-                  <FaUser className="text-gray-600 text-xs sm:text-sm" />
-                )}
-              </motion.div>
+            </AnimatePresence>
+
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-2 rounded-full transition-colors duration-300"
+              aria-label="Ouvrir le menu"
+            >
+              <FaBars
+                size={18}
+                className={isDevMode ? 'text-dev-muted' : scrolled ? 'text-os-text' : 'text-os-text'}
+              />
+            </button>
+
+            {/* Dev Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={toggleMode}
+              className={`flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.15em] font-medium font-display transition-all duration-300 ${
+                isDevMode
+                  ? 'border border-dev-green text-dev-green hover:bg-dev-green hover:text-black'
+                  : scrolled
+                    ? 'border border-os-border text-os-muted hover:border-os-text hover:text-os-text hover:bg-os-text hover:text-white'
+                    : 'border border-os-border/50 text-os-muted hover:border-os-text hover:text-os-text'
+              }`}
+            >
+              <FaCode size={11} />
+              <span className="hidden sm:inline">{isDevMode ? 'Dev' : 'Switch'}</span>
             </motion.button>
           </div>
         </div>
+      </motion.header>
 
-        {/* Navigation mobile */}
-        <nav className="md:hidden mt-4 flex justify-around border-t border-gray-200 pt-3">
-          {isDevMode ? (
-            <>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => scrollToSection('terminal')}
-                className="text-dev-accent font-mono text-xs sm:text-sm hover:text-white transition-colors"
+      {/* ===== Mobile Menu Overlay ===== */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            className={`fixed inset-0 z-[9998] md:hidden flex flex-col ${
+              isDevMode ? 'bg-dev-bg/98 backdrop-blur-xl' : 'bg-white/98 backdrop-blur-xl'
+            }`}
+          >
+            {/* Header bar inside overlay */}
+            <div className="flex items-center justify-between px-5 h-16 sm:h-[4.5rem]">
+              <button
+                onClick={() => {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center group"
               >
-                $ terminal
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => scrollToSection('code')}
-                className="text-dev-accent font-mono text-xs sm:text-sm hover:text-white transition-colors"
+                <img
+                  src={logo}
+                  alt="Logo"
+                  className="h-12 sm:h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                />
+              </button>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className={`p-2 rounded-full transition-colors duration-300 ${
+                  isDevMode
+                    ? 'text-dev-muted hover:text-dev-green'
+                    : 'text-os-muted hover:text-os-text'
+                }`}
+                aria-label="Fermer le menu"
               >
-                {'{ code }'}
-              </motion.button>
+                <FaTimes size={20} />
+              </button>
+            </div>
+
+            {/* Nav links — only show in normal mode */}
+            {isDevMode ? (
+              <div className="flex-1 flex flex-col items-center justify-center gap-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="text-center space-y-4"
+                >
+                  <p className="font-mono text-[10px] tracking-[0.3em] text-dev-muted uppercase">
+                    Prometheus OS Terminal v2.0
+                  </p>
+                  <p className="font-mono text-sm text-dev-text">
+                    jean-david@portfolio:~$ help
+                  </p>
+                  <p className="font-mono text-xs text-dev-muted leading-relaxed max-w-xs mx-auto">
+                    available: about, skills, contact, neofetch, clear
+                  </p>
+                </motion.div>
+              </div>
+            ) : (
+              <nav className="flex-1 flex flex-col items-center justify-center gap-8 sm:gap-10">
+                {navLinks.map((link, i) => (
+                  <motion.button
+                    key={link.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: 0.1 + i * 0.08,
+                      ease: [0.25, 0.1, 0.25, 1],
+                    }}
+                    onClick={() => scrollToSection(link.id)}
+                    className="group text-center"
+                  >
+                    <span className="block text-[10px] uppercase tracking-[0.3em] font-medium mb-2 text-os-muted">
+                      0{i + 1}
+                    </span>
+                    <span className="text-4xl sm:text-5xl font-display font-bold tracking-tight text-os-text group-hover:text-os-muted transition-colors duration-300">
+                      {link.label}
+                    </span>
+                  </motion.button>
+                ))}
+              </nav>
+            )}
+
+            {/* Footer of mobile menu */}
+            <div className="px-5 py-6 flex items-center justify-center">
               <motion.button
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => scrollToSection('stats')}
-                className="text-dev-accent font-mono text-xs sm:text-sm hover:text-white transition-colors"
+                onClick={() => {
+                  toggleMode();
+                  setMobileMenuOpen(false);
+                }}
+                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-[10px] uppercase tracking-[0.15em] font-medium font-display transition-all duration-300 ${
+                  isDevMode
+                    ? 'border border-dev-green text-dev-green hover:bg-dev-green hover:text-black'
+                    : 'border border-os-border text-os-muted hover:border-os-text hover:text-os-text hover:bg-os-text hover:text-white'
+                }`}
               >
-                // stats
+                <FaCode size={11} />
+                <span>{isDevMode ? 'Passer en mode Normal' : 'Passer en mode Dev'}</span>
               </motion.button>
-            </>
-          ) : (
-            <>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => scrollToSection('about')}
-                className="text-minimal-text text-xs sm:text-sm font-medium hover:text-[#2a5159] transition-colors"
-              >
-                À propos
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => scrollToSection('projects')}
-                className="text-minimal-text text-xs sm:text-sm font-medium hover:text-[#2a5159] transition-colors"
-              >
-                Projets
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => scrollToSection('contact')}
-                className="text-minimal-text text-xs sm:text-sm font-medium hover:text-[#2a5159] transition-colors"
-              >
-                Contact
-              </motion.button>
-            </>
-          )}
-        </nav>
-      </div>
-    </motion.header>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
