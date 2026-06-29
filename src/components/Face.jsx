@@ -9,19 +9,19 @@ const skills = [
   {
     num: '01',
     title: 'Développement Web',
-    desc: "Conception d'applications web modernes, performantes et scalables. Architecture frontend, APIs REST, et déploiement continu.",
+    desc: "Je conçois des sites et applications web sur mesure, conçus pour répondre à des besoins précis : vitrine, SaaS, CRM, service en ligne, outil métier ou plateforme interactive. Je travaille de la structure à l'interface pour proposer une expérience fluide, accessible et alignée avec les objectifs du projet. Chaque choix technique sert avant tout la clarté du parcours utilisateur et la fiabilité du produit sur le long terme.",
     items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Vite'],
   },
   {
     num: '02',
     title: 'IA & Automatisation',
-    desc: "Création d'agents autonomes et workflows automatisés. Intégration LLM, pipelines RAG, et systèmes agentiques.",
-    items: ['Python', 'LangChain', 'OpenAI API', 'n8n', 'MCP', 'Agentic Workflows'],
+    desc: "Je conçois des systèmes agentiques capables d'autonomiser des tâches complexes grâce aux modèles de langage (LLM). Mon approche combine LangChain pour l'orchestration et les protocoles MCP (Model Context Protocol) pour connecter les agents à des outils et des données en temps réel. J'ai une expérience pratique des pipelines RAG, des workflows n8n et des architectures multi-agents collaboratifs. L'objectif est toujours le même : transformer des processus manuels en automatisations fiables, mesurables et scalables.",
+    items: ['Python', 'LangChain', 'n8n', 'MCP', 'Agentic Workflows'],
   },
   {
     num: '03',
     title: 'Infrastructure & Design',
-    desc: "Infrastructure technique, versionning, et déploiement. Design d'interfaces et bases de données relationnelles.",
+    desc: "Un projet solide repose sur une infrastructure propre et une base de données bien pensée. Je gère le versioning avec Git, la containerisation avec Docker et le déploiement continu sur Vercel. Côté données, je privilégie PostgreSQL et Supabase pour leur fiabilité et leur intégration temps réel. Le design n'est pas un afterthought : j'utilise Figma pour prototyper et valider les interfaces avant de passer au code. Mon rôle est d'assurer la cohérence entre le visuel, l'architecture technique et la performance en production.",
     items: ['Git', 'Docker', 'Figma', 'PostgreSQL', 'Supabase', 'Vercel'],
   },
 ];
@@ -101,33 +101,21 @@ const Face = () => {
   const avatarY = useSpring(rawAvatarY, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   return (
-    <div className="min-h-screen bg-os-bg text-os-text pt-20 overflow-x-hidden">
+    <main className="min-h-screen bg-os-bg text-os-text pt-20 overflow-x-hidden">
       <div className="grain-overlay" />
 
       {/* ===== HERO ===== */}
-      <section id="about" className="relative px-5 sm:px-10 lg:px-20 xl:px-24 pt-12 sm:pt-16 pb-12 sm:pb-16 lg:pb-20">
+      <section id="about" className="relative px-5 sm:px-10 lg:px-20 xl:px-24 pt-12 sm:pt-20 lg:pt-24 pb-16 sm:pb-24 lg:pb-32">
         <div className="max-w-[1400px] mx-auto relative">
-
-          {/* Masthead label */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
-            className="flex justify-between items-start mb-10 sm:mb-16 lg:mb-20"
-          >
-            <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-os-muted font-medium font-display">
-              Web Developer · AI Automation · Agentic Engineer
-            </span>
-          </motion.div>
 
           {/* Name + Avatar */}
           <div className="relative">
-            <h1 className="text-[clamp(2.5rem,12vw,13rem)] font-display font-bold leading-[0.85] tracking-[-0.04em] text-center">
+            <h1 className="text-[clamp(2.8rem,13vw,14rem)] font-display font-bold leading-[0.82] tracking-[-0.04em] text-center">
               <AnimatedLetters text="Jean-David" />
             </h1>
 
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-center gap-6 lg:gap-0 mt-1 sm:mt-2 lg:mt-0 relative">
-              <h1 className="text-[clamp(2.5rem,12vw,13rem)] font-display font-bold leading-[0.85] tracking-[-0.04em] text-center">
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-center gap-6 lg:gap-0 mt-2 sm:mt-3 lg:mt-0 relative">
+              <h1 className="text-[clamp(2.8rem,13vw,14rem)] font-display font-bold leading-[0.82] tracking-[-0.04em] text-center">
                 <AnimatedLetters text="Zamblezie" delayOffset={12} />
               </h1>
 
@@ -136,53 +124,51 @@ const Face = () => {
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
                 style={{ y: avatarY }}
-                className="lg:absolute lg:bottom-0 lg:left-[3%] xl:left-[5%] flex-shrink-0 self-center lg:self-auto mt-4 lg:mt-0"
+                className="lg:absolute lg:bottom-[-1rem] lg:left-[-2%] xl:left-[0%] flex-shrink-0 self-center lg:self-auto mt-6 lg:mt-0"
               >
                 <img
                   src={avatar}
                   alt="Jean-David Zamblezie"
-                  className="w-32 sm:w-40 md:w-48 lg:w-56 h-auto object-contain max-w-full"
+                  className="w-36 sm:w-44 md:w-52 lg:w-60 h-auto object-contain max-w-full"
                   loading="eager"
                 />
               </motion.div>
             </div>
           </div>
 
-          {/* Bottom hero bar */}
+          {/* Tagline + CV */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.7 }}
-            className="mt-12 sm:mt-16 lg:mt-24 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 sm:gap-8"
+            className="mt-16 sm:mt-20 lg:mt-28 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 sm:gap-8"
           >
-            <p className="text-os-muted text-xs sm:text-sm lg:text-base max-w-[16rem] sm:max-w-xs leading-relaxed">
-              Développeur web spécialisé en automatisation IA et ingénierie agentique.
+            <p className="text-os-muted text-sm sm:text-base lg:text-lg max-w-sm leading-relaxed">
+              Web Developer · AI Automation · Agentic Engineer
             </p>
 
-            <div className="flex items-center gap-6">
-              <a
-                href={cv}
-                download="CV_Jean-David_Zamblezie.pdf"
-                className="group flex items-center gap-2.5 sm:gap-3 text-xs sm:text-sm font-medium"
-              >
-                <span className="border-b border-os-text pb-0.5 group-hover:text-os-muted group-hover:border-os-muted transition-colors duration-500">
-                  Télécharger le CV
-                </span>
-                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-os-border flex items-center justify-center group-hover:border-os-text group-hover:bg-os-text group-hover:text-white transition-all duration-500">
-                  <FaDownload size={11} />
-                </span>
-              </a>
-            </div>
+            <a
+              href={cv}
+              download="CV_Jean-David_Zamblezie.pdf"
+              className="group flex items-center gap-3 text-sm font-medium"
+            >
+              <span className="border-b border-os-text pb-0.5 group-hover:text-os-muted group-hover:border-os-muted transition-colors duration-500">
+                Télécharger le CV
+              </span>
+              <span className="w-9 h-9 rounded-full border border-os-border flex items-center justify-center group-hover:border-os-text group-hover:bg-os-text group-hover:text-white transition-all duration-500">
+                <FaDownload size={12} />
+              </span>
+            </a>
           </motion.div>
         </div>
       </section>
 
       {/* ===== SKILLS ===== */}
-      <section id="skills" className="relative">
+      <section id="skills" className="relative bg-os-surface/40">
         {skills.map((cat, index) => (
           <div
             key={cat.num}
-            className="relative px-5 sm:px-10 lg:px-20 xl:px-24 py-16 sm:py-24 lg:py-36"
+            className="relative px-5 sm:px-10 lg:px-20 xl:px-24 py-20 sm:py-28 lg:py-40"
           >
             {/* Line separator */}
             {index > 0 && (
@@ -195,20 +181,20 @@ const Face = () => {
               />
             )}
 
-            {/* Watermark number */}
+            {/* Watermark number — offset right so it doesn't overlap title */}
             <motion.span
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[clamp(6rem,20vw,22rem)] font-bold text-os-border/40 select-none pointer-events-none leading-none"
+              className="absolute top-1/2 left-[80%] sm:left-[70%] lg:left-[75%] -translate-x-1/2 -translate-y-1/2 text-[clamp(7rem,22vw,24rem)] font-display font-bold text-os-border/10 sm:text-os-border/20 select-none pointer-events-none leading-none"
             >
               {cat.num}
             </motion.span>
 
             <div className="max-w-[1400px] mx-auto relative z-10">
               {/* Title + skill tags */}
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 sm:gap-8 lg:gap-16 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 sm:gap-10 lg:gap-20 items-start">
                 <motion.div
                   custom={index}
                   initial="hidden"
@@ -216,10 +202,7 @@ const Face = () => {
                   viewport={{ once: true, amount: 0.4 }}
                   variants={revealUp}
                 >
-                  <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-os-muted font-medium font-display block mb-3 sm:mb-4">
-                    {cat.num} — Compétences
-                  </span>
-                  <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-display font-bold tracking-tight leading-tight">
+                  <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold tracking-tight leading-[1.05]">
                     {cat.title}
                   </h2>
                 </motion.div>
@@ -230,14 +213,14 @@ const Face = () => {
                   whileInView="visible"
                   viewport={{ once: true, amount: 0.4 }}
                   variants={revealUp}
-                  className="lg:pt-10"
+                  className="lg:pt-3"
                 >
-                  <div className="flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-1.5 sm:gap-y-2">
+                  <div className="flex flex-wrap gap-x-5 sm:gap-x-7 gap-y-2 sm:gap-y-3">
                     {cat.items.map((item, i) => (
-                      <span key={item} className="text-xs sm:text-sm lg:text-base text-os-muted">
+                      <span key={item} className="text-sm sm:text-base lg:text-lg text-os-muted font-medium">
                         {item}
                         {i < cat.items.length - 1 && (
-                          <span className="text-os-border ml-4 sm:ml-6">·</span>
+                          <span className="text-os-border ml-5 sm:ml-7">·</span>
                         )}
                       </span>
                     ))}
@@ -252,7 +235,7 @@ const Face = () => {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.4 }}
                 variants={revealUp}
-                className="mt-8 sm:mt-12 lg:mt-16 text-os-muted text-xs sm:text-sm lg:text-base max-w-xl leading-[1.8]"
+                className="mt-10 sm:mt-14 lg:mt-20 text-os-muted text-sm sm:text-base lg:text-lg max-w-2xl leading-[1.8]"
               >
                 {cat.desc}
               </motion.p>
@@ -271,9 +254,9 @@ const Face = () => {
       />
 
       {/* ===== CONTACT ===== */}
-      <section id="contact" className="px-5 sm:px-10 lg:px-20 xl:px-24 py-20 sm:py-28 lg:py-40 xl:py-48">
+      <section id="contact" className="px-5 sm:px-10 lg:px-20 xl:px-24 py-24 sm:py-32 lg:py-48">
         <div className="max-w-[1400px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-12 sm:gap-16 lg:gap-24">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-14 sm:gap-16 lg:gap-28">
             {/* Left */}
             <motion.div
               initial={{ opacity: 0, y: 50 }}
@@ -281,15 +264,12 @@ const Face = () => {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-os-muted font-medium font-display block mb-5 sm:mb-6">
-                Contact
-              </span>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold tracking-tight leading-[1.05] mb-6 sm:mb-8">
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-display font-bold tracking-tight leading-[1.05] mb-8 sm:mb-10">
                 Travaillons
                 <br />
                 ensemble.
               </h2>
-              <p className="text-os-muted text-xs sm:text-sm lg:text-base leading-relaxed max-w-sm">
+              <p className="text-os-muted text-sm sm:text-base lg:text-lg leading-relaxed max-w-md">
                 Vous avez un projet, une opportunité, ou juste envie d'échanger ?
                 Je suis toujours ouvert aux nouvelles collaborations.
               </p>
@@ -301,7 +281,7 @@ const Face = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1], delay: 0.15 }}
-              className="lg:pt-16 space-y-6 sm:space-y-8"
+              className="lg:pt-4 space-y-1"
             >
               {[
                 {
@@ -324,30 +304,34 @@ const Face = () => {
                   icon: FaLinkedin,
                   external: true,
                 },
-              ].map((link) => (
-                <a
+              ].map((link, i) => (
+                <motion.a
                   key={link.label}
                   href={link.href}
                   target={link.external ? '_blank' : undefined}
                   rel={link.external ? 'noopener noreferrer' : undefined}
-                  className="group flex items-center gap-3 sm:gap-4 py-2.5 sm:py-3"
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: i * 0.1, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="group flex items-center gap-4 sm:gap-5 py-5 sm:py-6 border-b border-os-border"
                 >
-                  <link.icon
-                    size={16}
-                    className="text-os-border group-hover:text-os-text transition-colors duration-500 sm:w-[18px] sm:h-[18px]"
-                  />
+                  <span className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-os-border flex items-center justify-center text-os-muted group-hover:border-os-text group-hover:text-os-text group-hover:bg-os-text group-hover:text-white transition-all duration-500 flex-shrink-0"
+                  >
+                    <link.icon size={18} />
+                  </span>
                   <div className="flex-1 min-w-0">
-                    <span className="text-[10px] sm:text-xs text-os-muted uppercase tracking-wider font-display block mb-0.5">
+                    <span className="text-xs sm:text-sm text-os-muted block mb-0.5">
                       {link.label}
                     </span>
-                    <span className="text-base sm:text-lg lg:text-xl text-os-text group-hover:text-os-text transition-colors duration-500 border-b border-transparent group-hover:border-os-text pb-0.5 truncate block">
+                    <span className="text-lg sm:text-xl lg:text-2xl text-os-text group-hover:text-os-text transition-colors duration-500 truncate block font-medium">
                       {link.value}
                     </span>
                   </div>
                   {link.external && (
                     <svg
-                      width="14"
-                      height="14"
+                      width="18"
+                      height="18"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -359,7 +343,7 @@ const Face = () => {
                       <path d="M7 7h10v10" />
                     </svg>
                   )}
-                </a>
+                </motion.a>
               ))}
             </motion.div>
           </div>
@@ -367,17 +351,45 @@ const Face = () => {
       </section>
 
       {/* ===== FOOTER ===== */}
-      <footer className="px-5 sm:px-10 lg:px-20 xl:px-24 py-6 sm:py-8 border-t border-os-border">
-        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <p className="text-[10px] sm:text-xs text-os-muted tracking-wider">
-            © {new Date().getFullYear()} Jean-David Zamblezie
-          </p>
-          <button
-            onClick={() => setShowLegal(true)}
-            className="text-[10px] sm:text-xs text-os-muted hover:text-os-text transition-colors duration-500 tracking-wider"
-          >
-            Mentions légales
-          </button>
+      <footer className="px-5 sm:px-10 lg:px-20 xl:px-24 py-10 sm:py-14 lg:py-20 border-t border-os-border bg-os-surface/30">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 lg:gap-12">
+            <div className="space-y-4">
+              <p className="text-os-text text-xl sm:text-2xl lg:text-3xl font-display font-bold leading-tight">
+                Jean-David
+                <br />
+                Zamblezie
+              </p>
+              <p className="text-os-muted text-sm">
+                © {new Date().getFullYear()} — Tous droits réservés.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+              <a
+                href="https://github.com/fwboa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://www.linkedin.com/in/jean-david-zamblezie-84410b258/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
+              >
+                LinkedIn
+              </a>
+              <button
+                onClick={() => setShowLegal(true)}
+                className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
+              >
+                Mentions légales
+              </button>
+            </div>
+          </div>
         </div>
       </footer>
 
@@ -402,10 +414,10 @@ const Face = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 40 }}
                 transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-                className="absolute inset-3 sm:inset-6 lg:inset-auto lg:top-20 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-2xl bg-white border border-os-text rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh]"
+                className="absolute inset-4 sm:inset-6 lg:inset-auto lg:top-20 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-2xl bg-white border border-os-text rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh]"
               >
                 <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-os-border">
-                  <span className="text-[10px] sm:text-xs text-os-muted font-medium tracking-wider uppercase">
+                  <span className="text-xs text-os-muted font-medium">
                     Mentions légales
                   </span>
                   <button
@@ -419,14 +431,14 @@ const Face = () => {
                 <div className="flex-1 overflow-y-auto p-5 sm:p-10 space-y-6 sm:space-y-8">
                   {legalContent.map((section) => (
                     <div key={section.title}>
-                      <h3 className="text-xs sm:text-sm font-bold mb-2 sm:mb-3 text-os-text">{section.title}</h3>
-                      <p className="text-os-muted text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+                      <h3 className="text-sm font-bold mb-2 sm:mb-3 text-os-text">{section.title}</h3>
+                      <p className="text-os-muted text-sm leading-relaxed whitespace-pre-line">
                         {section.body}
                       </p>
                     </div>
                   ))}
                   <div className="pt-3 sm:pt-4 border-t border-os-border">
-                    <p className="text-[10px] sm:text-xs text-os-muted">
+                    <p className="text-xs text-os-muted">
                       Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                   </div>
@@ -435,7 +447,7 @@ const Face = () => {
                 <div className="px-5 sm:px-6 py-3 sm:py-4 border-t border-os-border flex justify-end">
                   <button
                     onClick={() => setShowLegal(false)}
-                    className="px-5 sm:px-6 py-2 sm:py-2.5 bg-os-text text-white rounded-lg text-xs sm:text-sm font-medium hover:bg-os-muted transition-colors duration-300"
+                    className="px-5 sm:px-6 py-2 sm:py-2.5 bg-os-text text-white rounded-lg text-sm font-medium hover:bg-os-muted transition-colors duration-300"
                   >
                     Fermer
                   </button>
@@ -446,7 +458,7 @@ const Face = () => {
         </AnimatePresence>,
         document.body
       )}
-    </div>
+    </main>
   );
 };
 

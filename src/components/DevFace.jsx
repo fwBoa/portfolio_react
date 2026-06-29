@@ -66,7 +66,7 @@ const DevFace = () => {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="mb-10 sm:mb-14 lg:mb-20"
         >
-          <pre className="text-[0.28rem] sm:text-[0.32rem] md:text-xs lg:text-sm text-dev-green leading-[1.1] select-none overflow-x-auto whitespace-pre"
+          <pre className="text-[0.4rem] sm:text-[0.5rem] md:text-xs lg:text-sm text-dev-green leading-[1.1] select-none overflow-x-auto whitespace-pre"
           >
 {`
      ██╗███████╗ █████╗ ███╗   ██╗      ██████╗  █████╗ ██╗   ██╗██╗██████╗

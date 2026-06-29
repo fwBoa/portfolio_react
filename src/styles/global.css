@@ -56,6 +56,11 @@ body {
   outline-offset: 2px;
 }
 
+/* Remove default tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Link hover underline animation */
 .link-underline {
   position: relative;

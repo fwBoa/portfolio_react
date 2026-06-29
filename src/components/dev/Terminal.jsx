@@ -150,12 +150,12 @@ Skills:
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="flex-1 bg-transparent text-dev-text outline-none caret-dev-green text-xs sm:text-sm font-mono"
+            className="flex-1 bg-transparent text-dev-text outline-none text-xs sm:text-sm font-mono"
+            style={{ caretColor: '#00ff41' }}
             autoFocus
             spellCheck="false"
             autoComplete="off"
           />
-          <span className="text-dev-green animate-blink text-xs sm:text-sm">▊</span>
         </form>
       </div>
     </motion.div>
