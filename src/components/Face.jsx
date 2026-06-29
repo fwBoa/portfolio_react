@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaDownload, FaTimes } from 'react-icons/fa';
 import avatar from '../assets/Img/avatarportfoliobackgroundremove.png';
-import cv from '../assets/doc/cv_alternance.pdf';
+import cv from '../assets/doc/cv_alternance_2026.pdf';
 
 const skills = [
   {
@@ -149,7 +149,7 @@ const Face = () => {
 
             <a
               href={cv}
-              download="CV_Jean-David_Zamblezie.pdf"
+              download="cv_jeandavidzamblezie.pdf"
               className="group flex items-center gap-3 text-sm font-medium"
             >
               <span className="border-b border-os-text pb-0.5 group-hover:text-os-muted group-hover:border-os-muted transition-colors duration-500">
