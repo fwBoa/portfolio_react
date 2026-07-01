@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaDownload, FaTimes } from 'react-icons/fa';
@@ -270,7 +270,7 @@ const Face = () => {
                 ensemble.
               </h2>
               <p className="text-os-muted text-sm sm:text-base lg:text-lg leading-relaxed max-w-md">
-                Vous avez un projet, une opportunité, ou juste envie d'échanger ?
+                Vous avez un projet, une opportunité, ou juste envie d&apos;échanger ?
                 Je suis toujours ouvert aux nouvelles collaborations.
               </p>
             </motion.div>

@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCode, FaBars, FaTimes } from 'react-icons/fa';
 import logo from '../assets/Img/logo.png';
+
+const navLinks = [
+  { label: 'À propos', id: 'about' },
+  { label: 'Compétences', id: 'skills' },
+  { label: 'Contact', id: 'contact' },
+];
 
 const Header = ({ isDevMode, toggleMode }) => {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('about');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const navLinks = [
-    { label: 'À propos', id: 'about' },
-    { label: 'Compétences', id: 'skills' },
-    { label: 'Contact', id: 'contact' },
-  ];
 
   useEffect(() => {
     const onScroll = () => {

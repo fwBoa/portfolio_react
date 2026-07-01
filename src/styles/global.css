@@ -61,30 +61,6 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Link hover underline animation */
-.link-underline {
-  position: relative;
-  display: inline-block;
-}
-.link-underline::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: currentColor;
-  transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-.link-underline:hover::after {
-  width: 100%;
-}
-
-/* Magnetic button base */
-.magnetic-hover {
-  transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
 /* Grain texture overlay — editorial magazine feel */
 .grain-overlay {
   position: fixed;
@@ -112,8 +88,5 @@ body {
   }
   html {
     scroll-behavior: auto;
-  }
-  .animate-marquee {
-    animation: none;
   }
 }

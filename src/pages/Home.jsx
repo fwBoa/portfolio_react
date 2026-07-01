@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Header from '../components/Header';
 import ToggleFace from '../components/ToggleFace';
 import Face from '../components/Face';
 import DevFace from '../components/DevFace';
 
+const konamiSequence = [
+  'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+  'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+  'b', 'a',
+];
+
 const Home = () => {
   const [isDevMode, setIsDevMode] = useState(false);
   const [konamiCode, setKonamiCode] = useState([]);
-
-  const konamiSequence = [
-    'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
-    'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
-    'b', 'a',
-  ];
 
   const toggleMode = () => {
     setIsDevMode((prev) => {
@@ -28,8 +28,12 @@ const Home = () => {
   }, [isDevMode]);
 
   useEffect(() => {
-    const savedMode = localStorage.getItem('devMode');
-    if (savedMode) setIsDevMode(JSON.parse(savedMode));
+    try {
+      const savedMode = localStorage.getItem('devMode');
+      if (savedMode) setIsDevMode(JSON.parse(savedMode));
+    } catch {
+      localStorage.removeItem('devMode');
+    }
   }, []);
 
   useEffect(() => {

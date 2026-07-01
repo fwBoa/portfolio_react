@@ -1,17 +1,3 @@
-// Statistiques techniques du portfolio
-export const techStats = {
-  buildTime: "1.2s",
-  bundleSize: "245 KB",
-  components: 14,
-  linesOfCode: 2100,
-  technologies: [
-    { name: "React", logo: "⚛️", version: "19" },
-    { name: "Vite", logo: "⚡", version: "7" },
-    { name: "TailwindCSS", logo: "🎨", version: "3" },
-    { name: "Framer Motion", logo: "🎬", version: "12" },
-  ],
-};
-
 // Commandes disponibles pour le terminal
 export const terminalCommands = {
   help: {
@@ -122,17 +108,3 @@ projects/           assets/           README.md`
   }
 };
 
-// Easter eggs
-export const easterEggs = [
-  {
-    trigger: "konami",
-    code: ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"],
-    message: "Code Konami activé !",
-    action: "retro-mode"
-  },
-  {
-    trigger: "triple-click",
-    message: "Triple-clic détecté !",
-    action: "confetti"
-  }
-];
