@@ -1,28 +1,15 @@
 import { motion } from 'framer-motion';
 import Terminal from './dev/Terminal';
+import { site } from '../data/site';
+import { skillGroups } from '../data/skills';
 
 const stats = [
   { label: 'OS', value: 'Prometheus OS' },
-  { label: 'Host', value: 'Jean-David Zamblezie' },
+  { label: 'Host', value: site.name },
   { label: 'Kernel', value: 'React + Vite' },
   { label: 'Shell', value: 'zsh' },
   { label: 'WM', value: 'Framer Motion' },
   { label: 'Theme', value: 'Monochrome' },
-];
-
-const skillGroups = [
-  {
-    title: 'Web',
-    items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Vite'],
-  },
-  {
-    title: 'AI',
-    items: ['Python', 'LangChain', 'OpenAI', 'n8n', 'MCP', 'Agents'],
-  },
-  {
-    title: 'Tools',
-    items: ['Git', 'Docker', 'Figma', 'PostgreSQL', 'Supabase', 'Vercel'],
-  },
 ];
 
 const containerVariants = {
@@ -114,7 +101,7 @@ const DevFace = () => {
               {skillGroups.map((group) => (
                 <div key={group.title} className="mb-5 sm:mb-6">
                   <span className="text-[10px] sm:text-xs text-dev-green uppercase tracking-wider block mb-2">
-                    {group.title}
+                    {group.devTitle}
                   </span>
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
                     {group.items.map((item) => (
@@ -133,14 +120,14 @@ const DevFace = () => {
                 Contact
               </span>
               <div className="space-y-2">
-                <a href="mailto:jeandavidzamblezie@outlook.fr" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
-                  jeandavidzamblezie@outlook.fr
+                <a href={`mailto:${site.email}`} className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                  {site.email}
                 </a>
-                <a href="https://github.com/fwboa" target="_blank" rel="noopener noreferrer" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
-                  github.com/fwboa
+                <a href={site.github} target="_blank" rel="noopener noreferrer" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                  {site.githubLabel}
                 </a>
-                <a href="https://www.linkedin.com/in/jean-david-zamblezie-84410b258/" target="_blank" rel="noopener noreferrer" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
-                  linkedin.com/in/jean-david-zamblezie
+                <a href={site.linkedin} target="_blank" rel="noopener noreferrer" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                  {site.linkedinLabel}
                 </a>
               </div>
             </motion.div>
@@ -161,7 +148,7 @@ const DevFace = () => {
         >
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <span className="text-[10px] sm:text-xs text-dev-muted">
-              © {new Date().getFullYear()} Jean-David Zamblezie
+              © {new Date().getFullYear()} {site.name}
             </span>
             <span className="text-[10px] sm:text-xs text-dev-muted">
               jean-david@portfolio:~$ exit → logout

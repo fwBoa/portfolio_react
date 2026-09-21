@@ -1,3 +1,11 @@
+import { site } from './site';
+import { skillGroups } from './skills';
+
+// Sortie de la commande `skills` générée depuis la source unique
+const skillsOutput = skillGroups
+  .map((group) => `${group.title}\n  ${group.items.join(' · ')}`)
+  .join('\n\n');
+
 // Commandes disponibles pour le terminal
 export const terminalCommands = {
   help: {
@@ -20,12 +28,12 @@ export const terminalCommands = {
   },
   about: {
     description: "Informations personnelles",
-    output: `Jean-David Zamblezie
+    output: `${site.name}
 ━━━━━━━━━━━━━━━━━━━━━━
 Développeur web full stack spécialisé en
 automatisation IA et ingénierie agentique.
 
-Localisation : Paris, France
+Localisation : ${site.location}
 Expérience    : 1+ an
 Statut        : En alternance / Freelance
 
@@ -37,14 +45,7 @@ Stack principale :
   },
   skills: {
     description: "Compétences techniques",
-    output: `Développement Web
-  React · Next.js · TypeScript · Tailwind CSS · Node.js · Vite
-
-IA & Automatisation
-  Python · LangChain · OpenAI API · n8n · MCP · Agentic Workflows
-
-Infrastructure & Design
-  Git · Docker · Figma · PostgreSQL · Supabase · Vercel`
+    output: skillsOutput
   },
   projects: {
     description: "Liste des projets",
@@ -56,9 +57,9 @@ Infrastructure & Design
   },
   contact: {
     description: "Coordonnées",
-    output: `Email    : jeandavidzamblezie@outlook.fr
-GitHub   : github.com/fwboa
-LinkedIn : linkedin.com/in/jean-david-zamblezie
+    output: `Email    : ${site.email}
+GitHub   : ${site.githubLabel}
+LinkedIn : ${site.linkedinLabel}
 Site     : zamblezie.fr`
   },
   whoami: {

@@ -1,52 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaDownload, FaTimes } from 'react-icons/fa';
 import avatar from '../assets/Img/avatarportfoliobackgroundremove.png';
 import cv from '../assets/doc/cv_alternance_2026.pdf';
+import { site, LEGAL_LAST_UPDATED } from '../data/site';
+import { skillGroups as skills } from '../data/skills';
+import { legalSections, privacySections } from '../data/legal';
 
-const skills = [
-  {
-    num: '01',
-    title: 'Développement Web',
-    desc: "Je conçois des sites et applications web sur mesure, conçus pour répondre à des besoins précis : vitrine, SaaS, CRM, service en ligne, outil métier ou plateforme interactive. Je travaille de la structure à l'interface pour proposer une expérience fluide, accessible et alignée avec les objectifs du projet. Chaque choix technique sert avant tout la clarté du parcours utilisateur et la fiabilité du produit sur le long terme.",
-    items: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Vite'],
-  },
-  {
-    num: '02',
-    title: 'IA & Automatisation',
-    desc: "Je conçois des systèmes agentiques capables d'autonomiser des tâches complexes grâce aux modèles de langage (LLM). Mon approche combine LangChain pour l'orchestration et les protocoles MCP (Model Context Protocol) pour connecter les agents à des outils et des données en temps réel. J'ai une expérience pratique des pipelines RAG, des workflows n8n et des architectures multi-agents collaboratifs. L'objectif est toujours le même : transformer des processus manuels en automatisations fiables, mesurables et scalables.",
-    items: ['Python', 'LangChain', 'n8n', 'MCP', 'Agentic Workflows'],
-  },
-  {
-    num: '03',
-    title: 'Infrastructure & Design',
-    desc: "Un projet solide repose sur une infrastructure propre et une base de données bien pensée. Je gère le versioning avec Git, la containerisation avec Docker et le déploiement continu sur Vercel. Côté données, je privilégie PostgreSQL et Supabase pour leur fiabilité et leur intégration temps réel. Le design n'est pas un afterthought : j'utilise Figma pour prototyper et valider les interfaces avant de passer au code. Mon rôle est d'assurer la cohérence entre le visuel, l'architecture technique et la performance en production.",
-    items: ['Git', 'Docker', 'Figma', 'PostgreSQL', 'Supabase', 'Vercel'],
-  },
-];
-
-const legalContent = [
-  {
-    title: 'Éditeur du site',
-    body: 'Nom : Jean-David Zamblezie\nStatut : Développeur web\nEmail : jeandavidzamblezie@outlook.fr',
-  },
-  {
-    title: 'Hébergement',
-    body: 'Vercel\n340 S Lemon Ave #4133, Walnut, CA 91789, USA',
-  },
-  {
-    title: 'Propriété intellectuelle',
-    body: "L'ensemble du contenu de ce site est la propriété exclusive de Jean-David Zamblezie. Toute reproduction sans autorisation écrite préalable est interdite.",
-  },
-  {
-    title: 'Données personnelles (RGPD)',
-    body: "Les informations recueillies via le formulaire de contact sont utilisées uniquement pour répondre à vos demandes et ne sont jamais transmises à des tiers.\n\nPour exercer vos droits, contactez : jeandavidzamblezie@outlook.fr",
-  },
-  {
-    title: 'Cookies',
-    body: "Ce site n'utilise pas de cookies de tracking. Seuls des cookies techniques strictement nécessaires peuvent être utilisés.",
-  },
+const legalTabs = [
+  { id: 'legal', label: 'Mentions légales', sections: legalSections },
+  { id: 'privacy', label: 'Confidentialité', sections: privacySections },
 ];
 
 const revealUp = {
@@ -95,10 +59,36 @@ const AnimatedLetters = ({ text, className, delayOffset = 0 }) => (
 
 const Face = () => {
   const [showLegal, setShowLegal] = useState(false);
+  const [legalTab, setLegalTab] = useState('legal');
+
+  const openLegal = (tab) => {
+    setLegalTab(tab);
+    setShowLegal(true);
+  };
+
+  const activeTab = legalTabs.find((tab) => tab.id === legalTab) ?? legalTabs[0];
 
   const { scrollY } = useScroll();
   const rawAvatarY = useTransform(scrollY, [0, 800], [0, -50]);
   const avatarY = useSpring(rawAvatarY, { stiffness: 100, damping: 30, restDelta: 0.001 });
+
+  // Fermeture de la modale au clavier + blocage du scroll d'arrière-plan
+  useEffect(() => {
+    if (!showLegal) return;
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setShowLegal(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showLegal]);
 
   return (
     <main className="min-h-screen bg-os-bg text-os-text pt-20 overflow-x-hidden">
@@ -286,21 +276,21 @@ const Face = () => {
               {[
                 {
                   label: 'Email',
-                  value: 'jeandavidzamblezie@outlook.fr',
-                  href: 'mailto:jeandavidzamblezie@outlook.fr',
+                  value: site.email,
+                  href: `mailto:${site.email}`,
                   icon: FaEnvelope,
                 },
                 {
                   label: 'GitHub',
-                  value: 'github.com/fwboa',
-                  href: 'https://github.com/fwboa',
+                  value: site.githubLabel,
+                  href: site.github,
                   icon: FaGithub,
                   external: true,
                 },
                 {
                   label: 'LinkedIn',
-                  value: 'linkedin.com/in/jean-david-zamblezie',
-                  href: 'https://www.linkedin.com/in/jean-david-zamblezie-84410b258/',
+                  value: site.linkedinLabel,
+                  href: site.linkedin,
                   icon: FaLinkedin,
                   external: true,
                 },
@@ -367,7 +357,7 @@ const Face = () => {
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
               <a
-                href="https://github.com/fwboa"
+                href={site.github}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
@@ -375,7 +365,7 @@ const Face = () => {
                 GitHub
               </a>
               <a
-                href="https://www.linkedin.com/in/jean-david-zamblezie-84410b258/"
+                href={site.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
@@ -383,7 +373,13 @@ const Face = () => {
                 LinkedIn
               </a>
               <button
-                onClick={() => setShowLegal(true)}
+                onClick={() => openLegal('privacy')}
+                className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
+              >
+                Confidentialité
+              </button>
+              <button
+                onClick={() => openLegal('legal')}
                 className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
               >
                 Mentions légales
@@ -414,22 +410,53 @@ const Face = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 40 }}
                 transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="legal-modal-title"
                 className="absolute inset-4 sm:inset-6 lg:inset-auto lg:top-20 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-2xl bg-white border border-os-text rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[85vh]"
               >
-                <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-os-border">
-                  <span className="text-xs text-os-muted font-medium">
-                    Mentions légales
-                  </span>
+                <div className="flex items-center justify-between gap-3 px-5 sm:px-6 py-3.5 sm:py-4 border-b border-os-border">
+                  <h2 id="legal-modal-title" className="sr-only">
+                    Informations légales
+                  </h2>
+                  <div role="tablist" aria-label="Informations légales" className="flex items-center gap-1">
+                    {legalTabs.map((tab) => {
+                      const isActive = tab.id === legalTab;
+                      return (
+                        <button
+                          key={tab.id}
+                          role="tab"
+                          id={`legal-tab-${tab.id}`}
+                          aria-selected={isActive}
+                          aria-controls={`legal-panel-${tab.id}`}
+                          onClick={() => setLegalTab(tab.id)}
+                          className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-[13px] font-medium transition-colors duration-300 ${
+                            isActive
+                              ? 'bg-os-surface text-os-text'
+                              : 'text-os-muted hover:text-os-text'
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <button
                     onClick={() => setShowLegal(false)}
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-os-border flex items-center justify-center text-os-muted hover:border-os-text hover:text-os-text transition-all duration-300"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-os-border flex items-center justify-center text-os-muted hover:border-os-text hover:text-os-text transition-all duration-300 flex-shrink-0"
+                    aria-label="Fermer"
                   >
                     <FaTimes size={13} />
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-5 sm:p-10 space-y-6 sm:space-y-8">
-                  {legalContent.map((section) => (
+                <div
+                  id={`legal-panel-${activeTab.id}`}
+                  role="tabpanel"
+                  aria-labelledby={`legal-tab-${activeTab.id}`}
+                  className="flex-1 overflow-y-auto p-5 sm:p-10 space-y-6 sm:space-y-8"
+                >
+                  {activeTab.sections.map((section) => (
                     <div key={section.title}>
                       <h3 className="text-sm font-bold mb-2 sm:mb-3 text-os-text">{section.title}</h3>
                       <p className="text-os-muted text-sm leading-relaxed whitespace-pre-line">
@@ -439,7 +466,7 @@ const Face = () => {
                   ))}
                   <div className="pt-3 sm:pt-4 border-t border-os-border">
                     <p className="text-xs text-os-muted">
-                      Dernière mise à jour : {new Date().toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      Dernière mise à jour : {LEGAL_LAST_UPDATED}
                     </p>
                   </div>
                 </div>
