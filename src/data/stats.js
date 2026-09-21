@@ -14,7 +14,6 @@ export const terminalCommands = {
   help       Affiche cette aide
   about      À propos de moi
   skills     Mes compétences détaillées
-  projects   Projets réalisés
   contact    Coordonnées
   ls         Liste les fichiers
   cd         Change de répertoire
@@ -47,14 +46,6 @@ Stack principale :
     description: "Compétences techniques",
     output: skillsOutput
   },
-  projects: {
-    description: "Liste des projets",
-    output: `Projets :
-  1. Airspace        Plateforme de gestion collaborative (Next.js)
-  2. Terminal        Terminal interactif intégré (React)
-  3. Gîte Montplaisir Site WordPress sur mesure
-  4. SEBI-Kids       Plateforme éducative pour enfants (Next.js)`
-  },
   contact: {
     description: "Coordonnées",
     output: `Email    : ${site.email}
@@ -73,7 +64,7 @@ Site     : zamblezie.fr`
   ls: {
     description: "Liste les fichiers",
     output: `cv.pdf              skills.md         contact.json
-projects/           assets/           README.md`
+assets/             README.md         vercel.json`
   },
   uptime: {
     description: "Temps de fonctionnement",
