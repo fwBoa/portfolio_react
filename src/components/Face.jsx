@@ -150,7 +150,7 @@ const Face = () => {
             transition={{ duration: 1, delay: 0.7 }}
             className="mt-16 sm:mt-20 lg:mt-28 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 sm:gap-8"
           >
-            <p className="text-os-muted text-sm sm:text-base lg:text-lg max-w-sm leading-relaxed">
+            <p className="text-os-body text-sm sm:text-base lg:text-lg max-w-sm leading-relaxed">
               Web Developer · AI Automation · Agentic Engineer
             </p>
 
@@ -188,13 +188,14 @@ const Face = () => {
               />
             )}
 
-            {/* Watermark number — offset right so it doesn't overlap title */}
+            {/* Watermark number — masqué sous sm : sur mobile il passait derrière
+                le paragraphe et brouillait la lecture */}
             <motion.span
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
-              className="absolute top-1/2 left-[80%] sm:left-[70%] lg:left-[75%] -translate-x-1/2 -translate-y-1/2 text-[clamp(7rem,22vw,24rem)] font-display font-bold text-os-border/10 sm:text-os-border/20 select-none pointer-events-none leading-none"
+              className="hidden sm:block absolute top-1/2 sm:left-[70%] lg:left-[75%] -translate-x-1/2 -translate-y-1/2 text-[clamp(7rem,22vw,24rem)] font-display font-bold text-os-border/10 sm:text-os-border/20 select-none pointer-events-none leading-none"
             >
               {cat.num}
             </motion.span>
@@ -224,7 +225,7 @@ const Face = () => {
                 >
                   <div className="flex flex-wrap gap-x-5 sm:gap-x-7 gap-y-2 sm:gap-y-3">
                     {cat.items.map((item, i) => (
-                      <span key={item} className="text-sm sm:text-base lg:text-lg text-os-muted font-medium">
+                      <span key={item} className="text-sm sm:text-base lg:text-lg text-os-body font-medium">
                         {item}
                         {i < cat.items.length - 1 && (
                           <span className="text-os-border ml-5 sm:ml-7">·</span>
@@ -242,7 +243,7 @@ const Face = () => {
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.4 }}
                 variants={revealUp}
-                className="mt-10 sm:mt-14 lg:mt-20 text-os-muted text-sm sm:text-base lg:text-lg max-w-2xl leading-[1.8]"
+                className="mt-10 sm:mt-14 lg:mt-20 text-os-body text-sm sm:text-base lg:text-lg max-w-2xl leading-[1.8]"
               >
                 {cat.desc}
               </motion.p>
@@ -276,7 +277,7 @@ const Face = () => {
                 <br />
                 ensemble.
               </h2>
-              <p className="text-os-muted text-sm sm:text-base lg:text-lg leading-relaxed max-w-md">
+              <p className="text-os-body text-sm sm:text-base lg:text-lg leading-relaxed max-w-md">
                 Vous avez un projet, une opportunité, ou juste envie d&apos;échanger ?
                 Je suis toujours ouvert aux nouvelles collaborations.
               </p>
@@ -367,7 +368,7 @@ const Face = () => {
                 <br />
                 Zamblezie
               </p>
-              <p className="text-os-muted text-sm">
+              <p className="text-os-body text-sm">
                 © {new Date().getFullYear()} — Tous droits réservés.
               </p>
             </div>
@@ -478,7 +479,7 @@ const Face = () => {
                   {activeTab.sections.map((section) => (
                     <div key={section.title}>
                       <h3 className="text-sm font-bold mb-2 sm:mb-3 text-os-text">{section.title}</h3>
-                      <p className="text-os-muted text-sm leading-relaxed whitespace-pre-line">
+                      <p className="text-os-body text-sm leading-relaxed whitespace-pre-line">
                         {section.body}
                       </p>
                     </div>

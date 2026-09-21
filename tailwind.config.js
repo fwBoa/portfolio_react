@@ -12,6 +12,9 @@ export default {
         'os-surface': '#f0f5f5',
         'os-border': '#d0e0e0',
         'os-text': '#2d6b6b',
+        // Corps de texte lisible : 4.99:1 sur blanc (WCAG AA)
+        // os-muted (3.00:1) reste réservé aux éléments décoratifs et aux états secondaires
+        'os-body': '#457878',
         'os-muted': '#6b9e9e',
         // Dev Face — Terminal (only green on the site)
         'dev-bg': '#0a0a0a',
