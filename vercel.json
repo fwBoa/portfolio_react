@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.zamblezie.fr" }],
+      "destination": "https://zamblezie.fr/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "jean-david-zamblezie.vercel.app" }],
+      "destination": "https://zamblezie.fr/$1",
+      "permanent": true
+    }
+  ]
+}

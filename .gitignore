@@ -27,3 +27,5 @@ dist-ssr
 git.txt
 TODO.md
 
+.vercel
+.env*

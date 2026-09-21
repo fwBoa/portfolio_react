@@ -59,7 +59,7 @@ Infrastructure & Design
     output: `Email    : jeandavidzamblezie@outlook.fr
 GitHub   : github.com/fwboa
 LinkedIn : linkedin.com/in/jean-david-zamblezie
-Site     : jean-david-zamblezie.vercel.app`
+Site     : zamblezie.fr`
   },
   whoami: {
     description: "Identité",

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://jean-david-zamblezie.vercel.app/sitemap.xml
+Sitemap: https://zamblezie.fr/sitemap.xml
