@@ -9,10 +9,11 @@ export const legalSections = [
     title: 'Éditeur du site',
     body: [
       'Nom : Jean-David Zamblezie',
-      'Statut : Développeur web (particulier)',
-      'Ville : Paris, France',
-      'Adresse postale : communiquée à l\'hébergeur, conformément à l\'article 6-III-2 de la LCEN',
+      'Statut : Développeur web — éditeur non professionnel',
+      'Localisation : Paris, France',
       `Email : ${site.email}`,
+      '',
+      "L'éditeur agissant à titre non professionnel, son adresse postale n'est pas rendue publique. Elle a été communiquée à l'hébergeur, conformément à l'article 6-III-2 de la LCEN. L'email ci-dessus reste le seul canal de contact.",
     ].join('\n'),
   },
   {
@@ -21,7 +22,7 @@ export const legalSections = [
   },
   {
     title: 'Hébergement',
-    body: 'Vercel Inc.\n440 N Barranca Ave #4133, Covina, CA 91723, USA\nhttps://vercel.com',
+    body: 'Vercel Inc.\n440 N Barranca Ave #4133, Covina, CA 91723, USA\nhttps://vercel.com\n\nVercel assure l\'hébergement, la diffusion du site et la gestion technique du domaine zamblezie.fr.',
   },
   {
     title: 'Propriété intellectuelle',
