@@ -23,7 +23,6 @@ export default {
       },
       fontFamily: {
         'sans': ['Inter', 'system-ui', 'sans-serif'],
-        'serif': ['"Playfair Display"', 'Georgia', 'serif'],
         'mono': ['"JetBrains Mono"', 'Monaco', 'Courier New', 'monospace'],
         'display': ['"Syne"', 'system-ui', 'sans-serif'],
       },

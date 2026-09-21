@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCode, FaBars, FaTimes } from 'react-icons/fa';
 import logo from '../assets/Img/logo.png';
+import logoWebp from '../assets/Img/logo.webp';
 
 const navLinks = [
   { label: 'À propos', id: 'about' },
@@ -69,11 +70,16 @@ const Header = ({ isDevMode, toggleMode }) => {
             }}
             className="flex items-center group"
           >
-            <img
-              src={logo}
-              alt="Logo Jean-David Zamblezie"
-              className="h-12 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
-            />
+            <picture>
+              <source srcSet={logoWebp} type="image/webp" />
+              <img
+                src={logo}
+                alt="Logo Jean-David Zamblezie"
+                width="240"
+                height="170"
+                className="h-12 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+              />
+            </picture>
           </button>
 
           {/* Desktop Nav */}
@@ -180,11 +186,16 @@ const Header = ({ isDevMode, toggleMode }) => {
                 }}
                 className="flex items-center group"
               >
-                <img
-                  src={logo}
-                  alt="Logo"
-                  className="h-12 sm:h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
-                />
+                <picture>
+                  <source srcSet={logoWebp} type="image/webp" />
+                  <img
+                    src={logo}
+                    alt="Logo Jean-David Zamblezie"
+                    width="240"
+                    height="170"
+                    className="h-12 sm:h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                  />
+                </picture>
               </button>
               <button
                 onClick={() => setMobileMenuOpen(false)}

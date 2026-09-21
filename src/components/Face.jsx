@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaDownload, FaTimes } from 'react-icons/fa';
 import avatar from '../assets/Img/avatarportfoliobackgroundremove.png';
+import avatarWebp from '../assets/Img/avatar.webp';
 import cv from '../assets/doc/cv_alternance_2026.pdf';
 import { site, LEGAL_LAST_UPDATED } from '../data/site';
 import { skillGroups as skills } from '../data/skills';
@@ -98,32 +99,48 @@ const Face = () => {
       <section id="about" className="relative px-5 sm:px-10 lg:px-20 xl:px-24 pt-12 sm:pt-20 lg:pt-24 pb-16 sm:pb-24 lg:pb-32">
         <div className="max-w-[1400px] mx-auto relative">
 
-          {/* Name + Avatar */}
+          {/* Name + Avatar — un seul h1, ses deux lignes sont des spans */}
           <div className="relative">
             <h1 className="text-[clamp(2.8rem,13vw,14rem)] font-display font-bold leading-[0.82] tracking-[-0.04em] text-center">
-              <AnimatedLetters text="Jean-David" />
+              <span className="block">
+                <AnimatedLetters text="Jean-David" />
+              </span>
+
+              <span className="flex flex-col lg:flex-row lg:items-end lg:justify-center gap-6 lg:gap-0 mt-2 sm:mt-3 lg:mt-0 relative">
+                <span className="block">
+                  <AnimatedLetters text="Zamblezie" delayOffset={12} />
+                </span>
+
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.8, rotate: -3 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
+                  style={{ y: avatarY }}
+                  className="lg:absolute lg:bottom-[-1rem] lg:left-[-2%] xl:left-[0%] flex-shrink-0 self-center lg:self-auto mt-6 lg:mt-0 block"
+                >
+                  {/* Image décorative : le nom est déjà porté par le h1 */}
+                  <picture>
+                    <source srcSet={avatarWebp} type="image/webp" />
+                    <img
+                      src={avatar}
+                      alt=""
+                      aria-hidden="true"
+                      width="480"
+                      height="720"
+                      className="w-36 sm:w-44 md:w-52 lg:w-60 h-auto object-contain max-w-full"
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="async"
+                    />
+                  </picture>
+                </motion.span>
+
+                {/* Complète le h1 pour les moteurs de recherche et les lecteurs d'écran */}
+                <span className="sr-only">
+                  {' '}— Développeur web spécialisé en automatisation IA et ingénierie agentique
+                </span>
+              </span>
             </h1>
-
-            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-center gap-6 lg:gap-0 mt-2 sm:mt-3 lg:mt-0 relative">
-              <h1 className="text-[clamp(2.8rem,13vw,14rem)] font-display font-bold leading-[0.82] tracking-[-0.04em] text-center">
-                <AnimatedLetters text="Zamblezie" delayOffset={12} />
-              </h1>
-
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8, rotate: -3 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
-                style={{ y: avatarY }}
-                className="lg:absolute lg:bottom-[-1rem] lg:left-[-2%] xl:left-[0%] flex-shrink-0 self-center lg:self-auto mt-6 lg:mt-0"
-              >
-                <img
-                  src={avatar}
-                  alt="Jean-David Zamblezie"
-                  className="w-36 sm:w-44 md:w-52 lg:w-60 h-auto object-contain max-w-full"
-                  loading="eager"
-                />
-              </motion.div>
-            </div>
           </div>
 
           {/* Tagline + CV */}
