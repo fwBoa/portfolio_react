@@ -2,3 +2,6 @@ User-agent: *
 Allow: /
 
 Sitemap: https://zamblezie.fr/sitemap.xml
+
+# Contenu structuré pour les agents IA (cf. llmstxt.org)
+# https://zamblezie.fr/llms.txt

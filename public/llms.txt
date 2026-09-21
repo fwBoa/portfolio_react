@@ -1,0 +1,57 @@
+# Jean-David Zamblezie — Portfolio
+
+> Développeur web full stack basé à Paris, spécialisé en automatisation IA et ingénierie agentique. Conçoit des sites et applications web sur mesure (React, Next.js, TypeScript) ainsi que des systèmes agentiques (LangChain, MCP, n8n).
+
+Portfolio personnel de Jean-David Zamblezie. Le site présente trois domaines
+d'expertise : développement web, IA et automatisation, infrastructure et design.
+Disponible pour des missions en alternance ou en freelance.
+
+Contact : jeandavidzamblezie@outlook.fr
+
+## Pages
+
+- [Accueil](https://zamblezie.fr/): page unique présentant le profil, les compétences et les coordonnées
+
+## Profil
+
+- Nom complet : Jean-David Zamblezie
+- Rôle : Développeur Web · Automatisation IA · Ingénierie Agentique
+- Localisation : Paris, France
+- Statut : disponible en alternance ou en freelance
+- Expérience : 1+ an
+
+## Compétences
+
+### 01 — Développement Web
+React, Next.js, TypeScript, Tailwind CSS, Node.js, Vite
+
+Sites et applications web sur mesure : vitrine, SaaS, CRM, service en ligne,
+outil métier, plateforme interactive. De la structure à l'interface, avec une
+attention portée à la fluidité, à l'accessibilité et à la fiabilité.
+
+### 02 — IA & Automatisation
+Python, LangChain, OpenAI API, n8n, MCP, Agentic Workflows
+
+Systèmes agentiques capables d'autonomiser des tâches complexes grâce aux
+modèles de langage. Orchestration avec LangChain, connexion des agents aux
+outils et données via MCP (Model Context Protocol), pipelines RAG, workflows
+n8n et architectures multi-agents collaboratifs.
+
+### 03 — Infrastructure & Design
+Git, Docker, Figma, PostgreSQL, Supabase, Vercel
+
+Versioning avec Git, containerisation avec Docker, déploiement continu sur
+Vercel. Bases de données PostgreSQL et Supabase. Prototypage et validation des
+interfaces avec Figma avant développement.
+
+## Contact
+
+- Email : jeandavidzamblezie@outlook.fr
+- GitHub : https://github.com/fwboa
+- LinkedIn : https://www.linkedin.com/in/jean-david-zamblezie-84410b258/
+- Site : https://zamblezie.fr
+
+## Optional
+
+- [Contenu complet du portfolio](https://zamblezie.fr/llms-full.txt): l'intégralité du contenu de la page en markdown
+- [Mentions légales et politique de confidentialité](https://zamblezie.fr/): accessibles depuis le pied de page du site

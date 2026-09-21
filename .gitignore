@@ -29,3 +29,6 @@ TODO.md
 
 .vercel
 .env*
+
+# Généré au build depuis src/data/ (scripts/generate-llms.mjs)
+public/llms-full.txt

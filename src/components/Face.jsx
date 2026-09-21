@@ -407,7 +407,9 @@ const Face = () => {
       </footer>
 
       {/* ===== LEGAL MODAL ===== */}
-      {createPortal(
+      {/* Le portail cible le body : il n'existe pas côté serveur, donc on ne le
+          crée que dans le navigateur (cf. scripts/prerender.mjs). */}
+      {typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
           {showLegal && (
             <motion.div
