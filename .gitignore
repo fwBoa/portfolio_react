@@ -27,11 +27,6 @@ dist-ssr
 git.txt
 TODO.md
 
-# Skills d'agent installées par les intégrations (outil de dev, pas du site)
-.agents
-.claude
-skills-lock.json
-
 .vercel
 .env*
 

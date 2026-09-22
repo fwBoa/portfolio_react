@@ -15,10 +15,6 @@ export default {
         // Corps de texte lisible : 4.99:1 sur blanc (WCAG AA)
         // os-muted (3.00:1) reste réservé aux éléments décoratifs et aux états secondaires
         'os-body': '#457878',
-        // Corps de texte des articles : 7.37:1 sur blanc (WCAG AAA).
-        // Sur 2 000 mots, le confort prime — volontairement plus sombre que
-        // les titres (os-text, 6.13:1).
-        'os-reading': '#275e5e',
         'os-muted': '#6b9e9e',
         // Dev Face — Terminal (only green on the site)
         'dev-bg': '#0a0a0a',
