@@ -32,11 +32,25 @@ const log = (msg) => console.log(`[prerender] ${msg}`);
  * Routes à figer. Chaque entrée produit un fichier :
  *   '/'          -> dist/index.html
  *   '/blog'      -> dist/blog/index.html
- *   '/blog/x'    -> dist/blog/x/index.html
+ *   '/blog/<slug>' -> dist/blog/<slug>/index.html
  *
- * Les articles publiés seront ajoutés ici en phase 3, lus depuis la base.
+ * Les routes du blog sont lues depuis la base : si la base est injoignable, on
+ * retombe sur les routes statiques et le site reste déployable.
  */
-const routes = ['/', '/blog', '/blog/exemple-article'];
+import { listPublished, getPublishedBySlug } from '../src/lib/posts.js';
+
+const resolveRoutes = async () => {
+  const routes = ['/', '/blog'];
+  try {
+    const posts = await listPublished();
+    for (const post of posts) routes.push(`/blog/${post.slug}`);
+    log(`${routes.length - 2} article(s) publié(s) lu(s) depuis la base.`);
+    return routes;
+  } catch (error) {
+    log(`base injoignable (${error.message.split('\n')[0]}) — pré-rendu du portfolio et de la liste du blog.`);
+    return routes;
+  }
+};
 
 /**
  * Échappe une valeur destinée à un attribut HTML.
@@ -85,8 +99,13 @@ const applyMeta = (html, meta) => {
   return out;
 };
 
-/** Métadonnées par route. Les articles auront les leurs, lus depuis la base. */
-const metaFor = (route) => {
+/**
+ * Métadonnées par route. L'accueil garde celles du template ; les pages du
+ * blog les surchargent. Les articles utilisent leurs métadonnées d'auteur,
+ * avec le titre de l'article en repli.
+ */
+const siteName = 'Jean-David Zamblezie';
+const metaFor = (route, postByRoute) => {
   if (route === '/blog') {
     return {
       title: 'Notes — Jean-David Zamblezie',
@@ -97,10 +116,19 @@ const metaFor = (route) => {
   }
   if (route.startsWith('/blog/')) {
     const slug = route.slice('/blog/'.length);
+    const post = postByRoute.get(slug);
+    if (!post) {
+      return {
+        title: `${slug} — Notes de ${siteName}`,
+        description: 'Note de veille de Jean-David Zamblezie.',
+        canonical: `https://zamblezie.fr${route}`,
+      };
+    }
     return {
-      title: `${slug} — Notes de Jean-David Zamblezie`,
-      description: "Note de veille de Jean-David Zamblezie.",
+      title: post.meta_title || post.title,
+      description: post.meta_description || post.summary || '',
       canonical: `https://zamblezie.fr${route}`,
+      ogImage: post.og_image,
     };
   }
   return null;
@@ -114,6 +142,9 @@ try {
   if (!existsSync(join(distDir, 'index.html'))) {
     throw new Error('dist/index.html introuvable — lancez `vite build` avant.');
   }
+
+  const routes = await resolveRoutes();
+  const postByRoute = new Map();
 
   rmSync(ssrDir, { recursive: true, force: true });
 
@@ -139,7 +170,16 @@ try {
   let total = 0;
   for (const route of routes) {
     const appHtml = render(route);
-    const html = applyMeta(template, metaFor(route)).replace(
+
+    // Récupérer les données de l'article pour cette route, si c'en est une.
+    if (route.startsWith('/blog/')) {
+      const slug = route.slice('/blog/'.length);
+      const post = await getPublishedBySlug(slug);
+      if (post) postByRoute.set(slug, post);
+    }
+
+    const meta = metaFor(route, postByRoute);
+    const html = applyMeta(template, meta).replace(
       marker,
       `<div id="root">${appHtml}</div>`
     );
@@ -149,7 +189,7 @@ try {
     writeFileSync(file, html, 'utf8');
 
     total += appHtml.length;
-    log(`${route.padEnd(24)} → ${Math.round(appHtml.length / 1024)} Ko`);
+    log(`${route.padEnd(30)} → ${Math.round(appHtml.length / 1024)} Ko`);
   }
 
   log(`${routes.length} page(s) pré-rendue(s), ${Math.round(total / 1024)} Ko de contenu au total.`);

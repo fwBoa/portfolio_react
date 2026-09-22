@@ -6,14 +6,18 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/generate-llms.mjs",
-    "build": "vite build && node scripts/prerender.mjs",
+    "build": "vite build && node --env-file-if-exists=.env.local scripts/prerender.mjs",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "db:migrate": "node --env-file-if-exists=.env.local scripts/db-migrate.mjs",
+    "db:test": "node --env-file-if-exists=.env.local scripts/db-test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
     "@vercel/analytics": "^1.5.0",
+    "@vercel/functions": "^3.9.9",
     "framer-motion": "^12.23.24",
+    "pg": "^8.23.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",

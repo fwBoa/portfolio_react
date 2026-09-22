@@ -8,6 +8,14 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
+    // Code exécuté côté Node : scripts du build, fonctions serveur, couche
+    // d'accès aux données importée par les deux mondes.
+    files: ['scripts/**/*.mjs', 'src/lib/posts.js', 'src/entry-server.jsx'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+  {
     files: ['**/*.{js,jsx}'],
     extends: [
       js.configs.recommended,
