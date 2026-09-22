@@ -75,9 +75,9 @@ const Header = ({ isDevMode, toggleMode }) => {
               <img
                 src={logo}
                 alt="Logo Jean-David Zamblezie"
-                width="240"
-                height="170"
-                className="h-12 sm:h-14 lg:h-16 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                width="192"
+                height="192"
+                className="h-10 sm:h-11 lg:h-12 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </picture>
           </button>
@@ -191,9 +191,9 @@ const Header = ({ isDevMode, toggleMode }) => {
                   <img
                     src={logo}
                     alt="Logo Jean-David Zamblezie"
-                    width="240"
-                    height="170"
-                    className="h-12 sm:h-14 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                    width="192"
+                    height="192"
+                    className="h-10 sm:h-11 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
                   />
                 </picture>
               </button>
