@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { motion, useMotionValue, useTransform, useReducedMotion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from 'framer-motion';
 
 /**
  * SkillStack — liste de compétences en pastilles.
@@ -25,8 +25,8 @@ import { motion, useMotionValue, useTransform, useReducedMotion } from 'framer-m
  * déplacement de souris.
  */
 
-const AURA_RADIUS = 170; // px — rayon d'influence autour du curseur
-const MAX_LIFT = 0.055; // amplitude d'agrandissement au plus près
+const AURA_RADIUS = 240; // px — rayon d'influence autour du curseur
+const MAX_LIFT = 0.06; // amplitude d'agrandissement au plus près
 
 const chipListVariants = {
   hidden: {},
@@ -54,15 +54,25 @@ const Chip = ({ item, index, pointerX, pointerY, centers, magnetic, registerRef 
     return distance >= AURA_RADIUS ? 0 : 1 - distance / AURA_RADIUS;
   });
 
-  const scale = useTransform(proximity, [0, 1], [1, 1 + MAX_LIFT]);
-  const borderColor = useTransform(proximity, [0, 1], ['#d0e0e0', '#2d6b6b']);
-  const backgroundColor = useTransform(proximity, [0, 1], ['#ffffff', '#f0f5f5']);
+  // Lissage par ressort : sans ça, la pastille se déplace dès le premier pixel
+  // de souris et l'effet paraît saccadé. Le ressort donne de l'inertie — la
+  // valeur rattrape la cible progressivement, ce qui produit le rendu soyeux
+  // des interfaces Apple. Les valeurs sont volontairement douces (pas de
+  // rebond) : un rebond ici ferait « jouet ».
+  const softness = { stiffness: 120, damping: 20, mass: 0.6, restDelta: 0.001 };
+  const smoothScale = useSpring(useTransform(proximity, [0, 1], [1, 1 + MAX_LIFT]), softness);
+  const smoothBorder = useSpring(useTransform(proximity, [0, 1], [0, 1]), softness);
+
+  // Les couleurs ne peuvent pas être interpolées par useSpring, on garde donc
+  // useTransform sur la valeur lissée : la teinte suit le même tempo que l'échelle.
+  const borderColor = useTransform(smoothBorder, [0, 1], ['#d0e0e0', '#2d6b6b']);
+  const backgroundColor = useTransform(smoothBorder, [0, 1], ['#ffffff', '#f0f5f5']);
 
   return (
     <motion.li
       ref={(el) => registerRef(index, el)}
       variants={chipVariants}
-      style={{ scale, borderColor, backgroundColor }}
+      style={{ scale: smoothScale, borderColor, backgroundColor }}
       className="inline-flex items-center rounded-full border px-3.5 py-1.5 text-[13px] font-medium text-os-body sm:px-4 sm:py-2 sm:text-sm"
     >
       {item}
