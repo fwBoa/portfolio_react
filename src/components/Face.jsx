@@ -8,6 +8,7 @@ import cv from '../assets/doc/cv_alternance_2026.pdf';
 import { site, LEGAL_LAST_UPDATED } from '../data/site';
 import { skillGroups as skills } from '../data/skills';
 import { legalSections, privacySections } from '../data/legal';
+import SkillStack from './SkillStack';
 
 const legalTabs = [
   { id: 'legal', label: 'Mentions légales', sections: legalSections },
@@ -223,16 +224,9 @@ const Face = () => {
                   variants={revealUp}
                   className="lg:pt-3"
                 >
-                  <div className="flex flex-wrap gap-x-5 sm:gap-x-7 gap-y-2 sm:gap-y-3">
-                    {cat.items.map((item, i) => (
-                      <span key={item} className="text-sm sm:text-base lg:text-lg text-os-body font-medium">
-                        {item}
-                        {i < cat.items.length - 1 && (
-                          <span className="text-os-border ml-5 sm:ml-7">·</span>
-                        )}
-                      </span>
-                    ))}
-                  </div>
+                  {/* Stack en pastilles : entrée en cascade + aura magnétique.
+                      Le détail de l'animation est dans components/SkillStack.jsx. */}
+                  <SkillStack items={cat.items} />
                 </motion.div>
               </div>
 
