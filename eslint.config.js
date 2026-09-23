@@ -9,8 +9,15 @@ export default defineConfig([
   globalIgnores(['dist']),
   {
     // Code exécuté côté Node : scripts du build, fonctions serveur, couche
-    // d'accès aux données importée par les deux mondes.
-    files: ['scripts/**/*.mjs', 'src/lib/posts.js', 'src/entry-server.jsx'],
+    // d'accès aux données importée par les deux mondes. Ces fichiers ont
+    // besoin des globales Node (process, Buffer) que la configuration
+    // navigateur ci-dessous ne fournit pas.
+    files: [
+      'scripts/**/*.mjs',
+      'api/**/*.js',
+      'src/lib/posts.js',
+      'src/entry-server.jsx',
+    ],
     languageOptions: {
       globals: globals.node,
     },

@@ -37,18 +37,47 @@ const log = (msg) => console.log(`[prerender] ${msg}`);
  * Les routes du blog sont lues depuis la base : si la base est injoignable, on
  * retombe sur les routes statiques et le site reste déployable.
  */
-import { listPublished, getPublishedBySlug } from '../src/lib/posts.js';
+import { listPublished, getPublishedBySlug, getNeighbours } from '../src/lib/posts.js';
+import { JSDOM } from 'jsdom';
+import createDOMPurify from 'dompurify';
+import { marked } from 'marked';
+
+/**
+ * Rendu markdown → HTML assaini, exécuté uniquement au build.
+ *
+ * Un article est écrit par l'auteur mais transite par une base et, à terme,
+ * par un back-office : il ne peut pas être inséré tel quel. DOMPurify
+ * supprime scripts, gestionnaires d'événements et attributs dangereux.
+ *
+ * En Node, DOMPurify a besoin d'un DOM : jsdom le fournit. Le HTML produit
+ * ici est injecté tel quel dans la page (et dans window.__POST_DATA__) —
+ * le navigateur ne refait jamais ce travail, marked et DOMPurify ne
+ * quittent donc pas le build.
+ */
+const domPurify = createDOMPurify(new JSDOM('').window);
+const renderMarkdown = (markdown) => {
+  // Un `h1` au début d'un article est presque toujours la reprise du titre :
+  // la page en a déjà un (le sien). On le rétrograde en h2 pour garder un seul
+  // h1 par page — sémantique HTML et référencement.
+  const withShiftedHeading = (markdown ?? '').replace(
+    /^\s*#\s+(.+)$/m,
+    '## $1'
+  );
+  return domPurify.sanitize(marked.parse(withShiftedHeading), {
+    ADD_ATTR: ['target'], // liens externes ouverts dans un nouvel onglet
+    FORBID_TAGS: ['style'],
+  });
+};
 
 const resolveRoutes = async () => {
-  const routes = ['/', '/blog'];
   try {
     const posts = await listPublished();
-    for (const post of posts) routes.push(`/blog/${post.slug}`);
-    log(`${routes.length - 2} article(s) publié(s) lu(s) depuis la base.`);
-    return routes;
+    const routes = ['/', '/blog', ...posts.map((post) => `/blog/${post.slug}`)];
+    log(`${posts.length} article(s) publié(s) lu(s) depuis la base.`);
+    return { routes, posts };
   } catch (error) {
     log(`base injoignable (${error.message.split('\n')[0]}) — pré-rendu du portfolio et de la liste du blog.`);
-    return routes;
+    return { routes: ['/', '/blog'], posts: [] };
   }
 };
 
@@ -96,6 +125,32 @@ const applyMeta = (html, meta) => {
       `<meta property="og:url" content="${escapeAttr(meta.canonical)}"`
     );
   }
+  // Image de partage propre à la page.
+  //
+  // Sans ce bloc, une note qui déclare sa propre image serait ignorée : les
+  // réseaux sociaux afficheraient l'image générique du site à la place. C'est
+  // précisément ce qui se voit quand on partage un article.
+  //
+  // Les dimensions déclarées dans le gabarit sont retirées au passage : elles
+  // décrivent l'image par défaut, pas celle-ci, et une dimension fausse fait
+  // recadrer la carte de travers. Mieux vaut ne rien déclarer et laisser la
+  // plateforme mesurer l'image qu'elle télécharge.
+  if (meta.ogImage) {
+    out = out.replace(
+      /<meta property="og:image" content="[^"]*"/,
+      `<meta property="og:image" content="${escapeAttr(meta.ogImage)}"`
+    );
+    out = out.replace(
+      /<meta name="twitter:image" content="[^"]*"/,
+      `<meta name="twitter:image" content="${escapeAttr(meta.ogImage)}"`
+    );
+    for (const attribute of ['og:image:width', 'og:image:height', 'og:image:type']) {
+      out = out.replace(
+        new RegExp(`\\s*<meta property="${attribute}" content="[^"]*"\\s*/?>`),
+        ''
+      );
+    }
+  }
   return out;
 };
 
@@ -138,13 +193,157 @@ const metaFor = (route, postByRoute) => {
 const fileFor = (route) =>
   route === '/' ? join(distDir, 'index.html') : join(distDir, route.replace(/^\//, ''), 'index.html');
 
+const SITE_URL = 'https://zamblezie.fr';
+
+/**
+ * Données structurées d'une page, au format schema.org.
+ *
+ * L'accueil porte déjà son graphe JSON-LD dans index.html (WebSite, WebPage,
+ * Person) : on n'y touche pas. Ce sont les pages du blog qui ont besoin des
+ * leurs — sans quoi un moteur voit une page de texte sans savoir qu'il s'agit
+ * d'une liste d'articles ou d'un article daté et signé.
+ *
+ * `Blog` pour la liste, `BlogPosting` pour une note. BlogPosting plutôt que
+ * `Article` : c'est le type attendu pour un billet daté, et il est mieux
+ * compris des moteurs comme des moteurs de réponse.
+ *
+ * Le texte intégral n'est pas dupliqué dans le JSON-LD (`articleBody`) : la
+ * page le contient déjà, et le répéter doublerait le poids de chaque fichier
+ * pour un bénéfice nul.
+ */
+const jsonLdFor = (route, postByRoute, posts) => {
+  if (route === '/blog') {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Blog',
+      '@id': `${SITE_URL}/blog#blog`,
+      url: `${SITE_URL}/blog`,
+      name: `Notes — ${siteName}`,
+      description:
+        "Notes de veille sur l'automatisation IA, le développement web et les constats tirés de projets réels.",
+      inLanguage: 'fr-FR',
+      author: { '@id': `${SITE_URL}/#person` },
+      publisher: { '@id': `${SITE_URL}/#person` },
+      blogPost: posts.map((post) => ({
+        '@type': 'BlogPosting',
+        headline: post.title,
+        url: `${SITE_URL}/blog/${post.slug}`,
+        datePublished: post.published_at,
+        description: post.summary || undefined,
+      })),
+    };
+  }
+
+  if (route.startsWith('/blog/')) {
+    const post = postByRoute.get(route.slice('/blog/'.length));
+    if (!post) return null;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      '@id': `${SITE_URL}${route}#post`,
+      url: `${SITE_URL}${route}`,
+      headline: post.title,
+      description: post.meta_description || post.summary || undefined,
+      articleSection: post.theme || undefined,
+      datePublished: post.published_at,
+      dateModified: post.updated_at || post.published_at,
+      inLanguage: 'fr-FR',
+      // Le nom et l'URL de l'image ne sont déclarés que s'il y en a une : un
+      // og:image vide vaut moins que pas d'image du tout.
+      image: post.og_image || undefined,
+      author: { '@id': `${SITE_URL}/#person` },
+      publisher: { '@id': `${SITE_URL}/#person` },
+      isPartOf: { '@id': `${SITE_URL}/blog#blog` },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}${route}` },
+    };
+  }
+
+  // L'accueil apporte déjà son propre graphe dans le gabarit.
+  return null;
+};
+
+/**
+ * Sitemap du site, écrit dans dist/ (qui remplace public/ après le build).
+ *
+ * Il est produit ici, et non dans public/, parce que les notes n'existent
+ * qu'au moment du build : elles viennent de la base. Un sitemap statique
+ * dans public/ ignorerait tout article publié.
+ *
+ * `lastmod` porte la date de dernière modification réelle quand elle est
+ * connue — c'est ce qui aide un moteur à savoir quoi recrawler.
+ */
+const writeSitemap = (routes, postByRoute) => {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const entries = routes.map((route) => {
+    const isPost = route.startsWith('/blog/');
+    const post = isPost ? postByRoute.get(route.slice('/blog/'.length)) : null;
+
+    const priority = route === '/' ? '1.0' : isPost ? '0.7' : '0.8';
+    const lastmod = post?.updated_at
+      ? new Date(post.updated_at).toISOString().slice(0, 10)
+      : today;
+
+    return [
+      '  <url>',
+      `    <loc>${SITE_URL}${route === '/' ? '/' : route}</loc>`,
+      `    <lastmod>${lastmod}</lastmod>`,
+      `    <priority>${priority}</priority>`,
+      '  </url>',
+    ].join('\n');
+  });
+
+  const xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...entries,
+    '</urlset>',
+    '',
+  ].join('\n');
+
+  writeFileSync(join(distDir, 'sitemap.xml'), xml, 'utf8');
+  log(`sitemap.xml — ${routes.length} URL(s)`);
+};
+
 try {
   if (!existsSync(join(distDir, 'index.html'))) {
     throw new Error('dist/index.html introuvable — lancez `vite build` avant.');
   }
 
-  const routes = await resolveRoutes();
+  const { routes, posts } = await resolveRoutes();
+
+  // Données de chaque article, lues une fois : le contenu HTML (markdown
+  // assaini au build, jamais dans le navigateur) et les voisins pour la
+  // navigation précédent/suivant.
   const postByRoute = new Map();
+  for (const route of routes) {
+    if (!route.startsWith('/blog/')) continue;
+    const slug = route.slice('/blog/'.length);
+    const post = await getPublishedBySlug(slug);
+    if (post) {
+      post.html = renderMarkdown(post.content);
+      post.neighbours = await getNeighbours(slug);
+      postByRoute.set(slug, post);
+    }
+  }
+
+  // Chaque page du blog embarque dans window.__POST_DATA__ exactement les
+  // données dont elle a besoin : la liste pour /blog, l'article et ses
+  // voisins pour /blog/<slug>. Les pages restent des fichiers statiques —
+  // aucune requête de données au chargement, et l'hydratation reçoit les
+  // mêmes données que le rendu initial, sans écart possible.
+  // Le markdown brut est exclu de la sérialisation : seul le HTML assaini
+  // voyage dans la page, le contenu source ne sert qu'au rendu initial.
+  const dataFor = (route) => {
+    if (route === '/blog') return { posts };
+    if (route.startsWith('/blog/')) {
+      const stored = postByRoute.get(route.slice('/blog/'.length));
+      if (!stored) return null;
+      const { content, neighbours, ...post } = stored;
+      return { post, neighbours };
+    }
+    return null;
+  };
 
   rmSync(ssrDir, { recursive: true, force: true });
 
@@ -169,20 +368,28 @@ try {
 
   let total = 0;
   for (const route of routes) {
-    const appHtml = render(route);
-
-    // Récupérer les données de l'article pour cette route, si c'en est une.
-    if (route.startsWith('/blog/')) {
-      const slug = route.slice('/blog/'.length);
-      const post = await getPublishedBySlug(slug);
-      if (post) postByRoute.set(slug, post);
-    }
+    const data = dataFor(route);
+    const appHtml = render(route, data);
 
     const meta = metaFor(route, postByRoute);
-    const html = applyMeta(template, meta).replace(
-      marker,
-      `<div id="root">${appHtml}</div>`
-    );
+
+    // Les données de la page sont sérialisées dans le document. Le JSON est
+    // échappé pour qu'une séquence `</script>` dans un article ne puisse pas
+    // refermer la balise : c'est la contre-mesure standard de l'injection
+    // dans un script inline.
+    const dataScript = data
+      ? `<script>window.__POST_DATA__=${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`
+      : '';
+
+    // Données structurées : même échappement que ci-dessus, même raison.
+    const jsonLd = jsonLdFor(route, postByRoute, posts);
+    const jsonLdScript = jsonLd
+      ? `\n    <script type="application/ld+json">${JSON.stringify(jsonLd).replace(/</g, '\\u003c')}</script>`
+      : '';
+
+    const html = applyMeta(template, meta)
+      .replace(marker, `<div id="root">${appHtml}</div>`)
+      .replace('</head>', `${dataScript}${jsonLdScript}</head>`);
 
     const file = fileFor(route);
     mkdirSync(dirname(file), { recursive: true });
@@ -191,6 +398,8 @@ try {
     total += appHtml.length;
     log(`${route.padEnd(30)} → ${Math.round(appHtml.length / 1024)} Ko`);
   }
+
+  writeSitemap(routes, postByRoute);
 
   log(`${routes.length} page(s) pré-rendue(s), ${Math.round(total / 1024)} Ko de contenu au total.`);
   rmSync(ssrDir, { recursive: true, force: true });

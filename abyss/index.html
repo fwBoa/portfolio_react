@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- L'espace d'administration ne doit jamais être indexé : aucune valeur
+         publique, et son indexation révélerait son existence. La protection est
+         posée à trois niveaux complémentaires :
+
+           1. ici, <meta name="robots"> — un robot qui lit la page ne l'indexe pas ;
+           2. robots.txt — un robot bien élevé ne la visite même pas ;
+           3. en-tête X-Robots-Tag dans vercel.json — couvre les réponses qui ne
+              passeraient pas par ce HTML (erreurs, redirections).
+
+         Aucune de ces mesures n'est une protection d'accès : elles découragent
+         l'indexation, elles ne remplacent pas l'authentification. -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="referrer" content="same-origin" />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <title>Administration — Notes</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Syne:wght@500;700&family=JetBrains+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="admin-root"></div>
+    <script type="module" src="/src/abyss/main.jsx"></script>
+  </body>
+</html>

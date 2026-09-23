@@ -115,3 +115,18 @@ export async function getNeighbours(slug) {
     next: next.rows[0] ?? null,
   };
 }
+
+/**
+ * Ferme le pool de connexions.
+ *
+ * Utile aux scripts qui s'exécutent hors requête HTTP (build, pré-rendu) :
+ * sans cet appel, le pool garde une connexion ouverte et le processus Node ne
+ * se termine pas de lui-même. Le pré-rendu n'en a pas besoin — il tourne dans
+ * un processus qui se ferme de toute façon — mais les scripts qui enchaînent
+ * plusieurs étapes y gagnent un arrêt net.
+ */
+export async function closePool() {
+  if (!pool) return;
+  await pool.end();
+  pool = null;
+}

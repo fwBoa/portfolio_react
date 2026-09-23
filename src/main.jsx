@@ -5,9 +5,15 @@ import App from './App.jsx'
 
 const container = document.getElementById('root')
 
+// Les données de la page (liste des notes, ou l'article affiché et ses
+// voisins) sont sérialisées au build dans window.__POST_DATA__ par
+// scripts/prerender.mjs. Elles n'existent que sur les pages du blog
+// pré-rendues ; l'accueil et le dev n'en ont pas besoin.
+const data = window.__POST_DATA__ ?? null
+
 const app = (
   <StrictMode>
-    <App />
+    <App data={data} />
   </StrictMode>
 )
 

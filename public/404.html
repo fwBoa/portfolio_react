@@ -175,6 +175,12 @@
       footer a { color: var(--muted); text-decoration: none; transition: color 0.3s ease; }
       footer a:hover { color: var(--text); }
 
+      footer nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+      }
+
       /* Mode terminal — préférence système */
       @media (prefers-color-scheme: dark) {
         :root {
@@ -221,7 +227,11 @@
     <footer>
       <div class="inner">
         <span>© <span id="year">2026</span> Jean-David Zamblezie</span>
-        <a href="https://zamblezie.fr/">zamblezie.fr</a>
+        <nav>
+          <a href="https://zamblezie.fr/blog">Notes</a>
+          <a href="https://zamblezie.fr/#contact">Contact</a>
+          <a href="mailto:jeandavidzamblezie@outlook.fr">Email</a>
+        </nav>
       </div>
     </footer>
 

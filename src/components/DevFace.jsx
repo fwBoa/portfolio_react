@@ -138,23 +138,6 @@ const DevFace = () => {
             <Terminal />
           </div>
         </motion.div>
-
-        {/* Footer */}
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-16 sm:mt-20 lg:mt-24 pt-6 border-t border-dev-border"
-        >
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <span className="text-[10px] sm:text-xs text-dev-muted">
-              © {new Date().getFullYear()} {site.name}
-            </span>
-            <span className="text-[10px] sm:text-xs text-dev-muted">
-              jean-david@portfolio:~$ exit → logout
-            </span>
-          </div>
-        </motion.footer>
       </div>
     </div>
   );

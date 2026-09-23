@@ -5,18 +5,24 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/generate-llms.mjs",
+    "prebuild": "node --env-file-if-exists=.env.local scripts/generate-llms.mjs",
     "build": "vite build && node --env-file-if-exists=.env.local scripts/prerender.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/db-migrate.mjs",
-    "db:test": "node --env-file-if-exists=.env.local scripts/db-test.mjs"
+    "db:test": "node --env-file-if-exists=.env.local scripts/db-test.mjs",
+    "admin:password": "node scripts/admin-password.mjs",
+    "admin:serve": "node --env-file-if-exists=.env.local scripts/admin-serve.mjs",
+    "admin:test": "node scripts/admin-test.mjs",
+    "admin:test:db": "node --env-file-if-exists=.env.local scripts/admin-db-test.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
     "@vercel/analytics": "^1.5.0",
     "@vercel/functions": "^3.9.9",
+    "dompurify": "^3.4.15",
     "framer-motion": "^12.23.24",
+    "marked": "^18.0.14",
     "pg": "^8.23.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -34,6 +40,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
+    "jsdom": "^30.1.1",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "vite": "^7.1.7"

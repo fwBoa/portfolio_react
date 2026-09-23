@@ -1,5 +1,21 @@
+# Espace d'administration — /abyss
+#
+# Il n'est PAS interdit d'exploration, et c'est délibéré. Une règle Disallow
+# empêcherait un robot de lire la page, donc de voir son « noindex » : il
+# pourrait alors indexer l'URL sans contenu. Pour obtenir une vraie
+# désindexation, la page doit rester explorable et porter la directive — ce
+# qu'elle fait (meta robots dans abyss/index.html, X-Robots-Tag dans
+# vercel.json). Explorer ne donne rien : la page ne contient qu'un formulaire
+# de connexion.
+#
+# Aucune de ces mesures ne protège l'accès. C'est le rôle de l'authentification,
+# côté serveur, sur chaque route d'API.
+#
+# Les points d'API sont en revanche écartés : rien à y indexer, et cela évite
+# qu'un robot sollicite les routes de connexion.
 User-agent: *
 Allow: /
+Disallow: /api/
 
 Sitemap: https://zamblezie.fr/sitemap.xml
 
