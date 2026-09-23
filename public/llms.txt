@@ -11,6 +11,13 @@ Contact : jeandavidzamblezie@outlook.fr
 ## Pages
 
 - [Accueil](https://zamblezie.fr/): page unique présentant le profil, les compétences et les coordonnées
+- [Notes](https://zamblezie.fr/blog): notes de veille sur l'automatisation IA, le développement web et les constats tirés de projets réels
+
+## Notes récentes
+
+Les notes sont datées et numérotées. Le fichier
+[llms-full.txt](https://zamblezie.fr/llms-full.txt) en donne la liste à jour,
+avec titre, thème, résumé et lien.
 
 ## Profil
 

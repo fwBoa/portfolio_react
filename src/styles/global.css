@@ -71,6 +71,37 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
+/* ── Entrée en cascade des notes du blog ────────────────────────────────
+   En CSS et non avec Framer Motion : le HTML est figé au build, et une
+   animation pilotée par JavaScript laisse « opacity: 0 » dans le fichier.
+   Le contenu ne redeviendrait visible qu'à l'exécution du script — ce qui
+   contredit l'objectif des pages pré-rendues. Ici, l'animation part avec
+   les images et le texte reste lisible même sans JavaScript.
+
+   `backwards` fait démarrer l'élément à son état initial pendant le délai,
+   puis `forwards` le laisse à l'état final : sans les deux, la note
+   clignoterait avant de se poser. */
+@keyframes note-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.note-enter {
+  animation: note-enter 0.5s cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note-enter {
+    animation: none;
+  }
+}
+
 /* Terminal cursor blink */
 @keyframes blink {
   0%, 100% { opacity: 1; }
@@ -78,6 +109,216 @@ body {
 }
 .animate-blink {
   animation: blink 1s step-end infinite;
+}
+
+/* ── Corps d'article — typographie de lecture longue ─────────────────────
+   Cible : 2000 mots lus avec le moins de friction possible.
+   - corps 18px, interligne 1.75 (plus aéré que l'interface, 1.6)
+   - couleur os-reading (#275e5e, 7.37:1 = WCAG AAA)
+   - mesure bornée par max-w-[68ch] sur le conteneur, pas ici
+   - chaque élément porte son propre rythme vertical */
+.article-body {
+  font-size: 1.125rem;          /* 18px */
+  line-height: 1.75;
+  color: #275e5e;
+}
+
+.article-body > * + * {
+  margin-top: 1.5em;            /* séparation des paragraphes, sans indentation */
+}
+
+.article-body h2 {
+  font-family: 'Syne', system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #2d6b6b;               /* les titres restent os-text, plus clairs */
+  margin-top: 2em;
+}
+
+.article-body h3 {
+  font-family: 'Syne', system-ui, sans-serif;
+  font-size: 1.1875rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  color: #2d6b6b;
+  margin-top: 1.75em;
+}
+
+.article-body a {
+  color: #2d6b6b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #d0e0e0;
+  transition: text-decoration-color 0.3s ease;
+}
+
+.article-body a:hover {
+  text-decoration-color: #2d6b6b;
+}
+
+/* Code inline — fond surface, mono, un cran plus petit que le corps */
+.article-body code {
+  font-family: 'JetBrains Mono', Monaco, monospace;
+  font-size: 0.875em;
+  background: #f0f5f5;
+  border: 1px solid #d0e0e0;
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+/* Bloc de code — cadre, fond surface, défilement horizontal sur mobile */
+.article-body pre {
+  background: #f0f5f5;
+  border: 1px solid #d0e0e0;
+  border-radius: 8px;
+  padding: 1.25rem 1.25rem;
+  overflow-x: auto;
+}
+
+.article-body pre code {
+  font-size: 0.8125rem;
+  background: none;
+  border: none;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* Citation — bordure gauche teal, italique léger */
+.article-body blockquote {
+  border-left: 2px solid #2d6b6b;
+  padding-left: 1.25rem;
+  font-style: italic;
+  color: #457878;               /* une teinte au-dessus du corps, secondaire */
+}
+
+/* Encadré — fond surface, sans bordure forte */
+.article-body aside {
+  background: #f0f5f5;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  font-size: 1rem;
+}
+
+/* Listes — tiret cadratin plutôt que rond plein */
+.article-body ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.article-body ul li {
+  position: relative;
+  padding-left: 1.5em;
+}
+
+.article-body ul li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: #6b9e9e;               /* décoratif : os-muted */
+}
+
+.article-body ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+
+/* Séparateur horizontal — discret */
+.article-body hr {
+  border: none;
+  border-top: 1px solid #d0e0e0;
+  margin: 2.5em 0;
+}
+
+/* Images — rares, techniques : pleine largeur du conteneur, arrondies */
+.article-body img {
+  border-radius: 8px;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Tableaux ───────────────────────────────────────────────────────────
+   Un tableau GFM arrive sans aucun style : bordures invisibles, colonnes
+   collées, en-tête indistinct du corps. Il faut donc le poser entièrement.
+
+   Défilement horizontal sur mobile plutôt que compression : un tableau de
+   quatre colonnes écrasé dans 350 px devient illisible. */
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;      /* 15px — un cran sous le corps, pour la densité */
+  display: block;            /* nécessaire pour overflow sur un tableau */
+  overflow-x: auto;
+  white-space: nowrap;       /* une cellule ne se coupe pas en plein mot */
+}
+
+@media (min-width: 640px) {
+  .article-body table {
+    display: table;
+    white-space: normal;
+  }
+}
+
+.article-body th,
+.article-body td {
+  border: 1px solid #d0e0e0;
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.article-body th {
+  background: #f0f5f5;
+  font-family: 'Syne', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  color: #2d6b6b;
+}
+
+/* L'alignement demandé dans le markdown (`:---:`, `---:`) est porté par un
+   attribut `align` que DOMPurify conserve ; on le traduit ici, car il n'a
+   plus d'effet en CSS moderne. */
+.article-body th[align='center'],
+.article-body td[align='center'] {
+  text-align: center;
+}
+.article-body th[align='right'],
+.article-body td[align='right'] {
+  text-align: right;
+}
+
+/* Bloc dépliable : rare, mais utile pour un détail qu'on ne veut pas imposer
+   à la lecture. */
+.article-body details {
+  border: 1px solid #d0e0e0;
+  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
+}
+
+.article-body summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: #2d6b6b;
+}
+
+.article-body details[open] summary {
+  margin-bottom: 0.75rem;
+}
+
+/* Vidéo : même traitement que les images. */
+.article-body video {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Listes de tâches GFM : la case est déjà rendue par le navigateur, on
+   s'assure juste qu'elle ne casse pas l'alignement du texte. */
+.article-body li > input[type='checkbox'] {
+  margin-right: 0.5em;
 }
 
 /* Reduced motion */

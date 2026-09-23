@@ -1,49 +1,67 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCode, FaBars, FaTimes } from 'react-icons/fa';
-import logo from '../assets/Img/logo.png';
-import logoWebp from '../assets/Img/logo.webp';
+import logo from '../../assets/Img/logo.png';
+import logoWebp from '../../assets/Img/logo.webp';
 
-const navLinks = [
-  { label: 'À propos', id: 'about' },
-  { label: 'Compétences', id: 'skills' },
-  { label: 'Contact', id: 'contact' },
+/**
+ * En-tête du site, partagé par toutes les pages.
+ *
+ * Deux types de destinations cohabitent dans la navigation, et c'est ce qui
+ * distingue ce composant d'un simple sommaire :
+ *
+ * - Les ancres (`#about`, `#skills`, `#contact`) ne vivent que sur l'accueil.
+ *   Depuis une autre page, le navigateur y va seul — c'est le comportement
+ *   natif d'une URL absolue `/` + hash, et il fonctionne sans JavaScript.
+ *   C'est pourquoi les entrées utilisent des `<a href>` et non des boutons :
+ *   un bouton exigerait de savoir sur quelle page on se trouve et de gérer
+ *   le retour. Ici, l'état actif se contente d'éclairer le bon lien.
+ *
+ * - Les pages (`/`, `/blog`) sont de vraies URL.
+ *
+ * L'état actif est fourni par la page (`activeSection`), pas calculé ici :
+ * le défilement ne concerne que l'accueil.
+ */
+
+const NAV_LINKS = [
+  { label: 'À propos', href: '/#about', section: 'about' },
+  { label: 'Compétences', href: '/#skills', section: 'skills' },
+  { label: 'Notes', href: '/blog', section: 'notes' },
+  { label: 'Contact', href: '/#contact', section: 'contact' },
 ];
 
-const Header = ({ isDevMode, toggleMode }) => {
+const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
   const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState('about');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 40);
-
-      // Scroll spy
-      const sections = navLinks.map((link) => document.getElementById(link.id));
-      const scrollPos = window.scrollY + 150;
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        if (sections[i] && sections[i].offsetTop <= scrollPos) {
-          setActiveSection(navLinks[i].id);
-          break;
-        }
-      }
-    };
-
+    const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const headerOffset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-    }
+  // Le menu mobile occupe tout l'écran : tant qu'il est ouvert, l'arrière-plan
+  // ne doit pas défiler. La fermeture au clavier va de pair.
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileMenuOpen]);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     setMobileMenuOpen(false);
   };
 
@@ -62,14 +80,8 @@ const Header = ({ isDevMode, toggleMode }) => {
         }`}
       >
         <div className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 flex items-center justify-between h-16 sm:h-[4.5rem] lg:h-20">
-          {/* Logo */}
-          <button
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setMobileMenuOpen(false);
-            }}
-            className="flex items-center group"
-          >
+          {/* Logo — ramène à l'accueil */}
+          <a href="/" onClick={scrollToTop} className="flex items-center group">
             <picture>
               <source srcSet={logoWebp} type="image/webp" />
               <img
@@ -80,26 +92,25 @@ const Header = ({ isDevMode, toggleMode }) => {
                 className="h-10 sm:h-11 lg:h-12 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
               />
             </picture>
-          </button>
+          </a>
 
-          {/* Desktop Nav */}
+          {/* Navigation — bureau */}
           <nav className="hidden md:flex items-center">
             {isDevMode ? (
               <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.15em] text-dev-muted uppercase">
-                jean-david@portfolio:~$<span className="inline-block w-1.5 h-3.5 bg-dev-green ml-1 align-middle animate-blink" />
+                jean-david@portfolio:~$
+                <span className="inline-block w-1.5 h-3.5 bg-dev-green ml-1 align-middle animate-blink" />
               </span>
             ) : (
               <div className="flex items-center gap-1">
-                {navLinks.map((link) => {
-                  const isActive = activeSection === link.id;
+                {NAV_LINKS.map((link) => {
+                  const isActive = activeSection === link.section;
                   return (
-                    <button
-                      key={link.id}
-                      onClick={() => scrollToSection(link.id)}
+                    <a
+                      key={link.section}
+                      href={link.href}
                       className={`relative px-4 py-2 text-[11px] uppercase tracking-[0.15em] font-medium font-display transition-colors duration-300 rounded-full ${
-                        isActive
-                          ? 'text-os-text'
-                          : 'text-os-muted hover:text-os-text'
+                        isActive ? 'text-os-text' : 'text-os-muted hover:text-os-text'
                       }`}
                     >
                       {link.label}
@@ -110,18 +121,17 @@ const Header = ({ isDevMode, toggleMode }) => {
                           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                         />
                       )}
-                    </button>
+                    </a>
                   );
                 })}
               </div>
             )}
           </nav>
 
-          {/* Right: Mobile hamburger + Toggle */}
+          {/* Droite : indicateur de section, menu mobile, bascule */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Section indicator dot (desktop only) */}
             <AnimatePresence mode="wait">
-              {!isDevMode && (
+              {!isDevMode && activeSection && (
                 <motion.span
                   key={activeSection}
                   initial={{ opacity: 0, scale: 0 }}
@@ -132,39 +142,38 @@ const Header = ({ isDevMode, toggleMode }) => {
               )}
             </AnimatePresence>
 
-            {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden p-2 rounded-full transition-colors duration-300"
               aria-label="Ouvrir le menu"
             >
-              <FaBars
-                size={18}
-                className={isDevMode ? 'text-dev-muted' : scrolled ? 'text-os-text' : 'text-os-text'}
-              />
+              <FaBars size={18} className="text-os-text" />
             </button>
 
-            {/* Dev Toggle */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={toggleMode}
-              className={`flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.15em] font-medium font-display transition-all duration-300 ${
-                isDevMode
-                  ? 'border border-dev-green text-dev-green hover:bg-dev-green hover:text-black'
-                  : scrolled
-                    ? 'border border-os-border text-os-muted hover:border-os-text hover:text-os-text hover:bg-os-text hover:text-white'
-                    : 'border border-os-border/50 text-os-muted hover:border-os-text hover:text-os-text'
-              }`}
-            >
-              <FaCode size={11} />
-              <span className="hidden sm:inline">{isDevMode ? 'Dev' : 'Switch'}</span>
-            </motion.button>
+            {/* Bascule de mode — proposée sur l'accueil uniquement : le blog
+                n'a qu'une seule mise en forme, celle du site. */}
+            {toggleMode && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={toggleMode}
+                className={`flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.15em] font-medium font-display transition-all duration-300 ${
+                  isDevMode
+                    ? 'border border-dev-green text-dev-green hover:bg-dev-green hover:text-black'
+                    : scrolled
+                      ? 'border border-os-border text-os-muted hover:border-os-text hover:text-os-text'
+                      : 'border border-os-border/50 text-os-muted hover:border-os-text hover:text-os-text'
+                }`}
+              >
+                <FaCode size={11} />
+                <span className="hidden sm:inline">{isDevMode ? 'Dev' : 'Switch'}</span>
+              </motion.button>
+            )}
           </div>
         </div>
       </motion.header>
 
-      {/* ===== Mobile Menu Overlay ===== */}
+      {/* ===== Menu mobile ===== */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -177,15 +186,8 @@ const Header = ({ isDevMode, toggleMode }) => {
               isDevMode ? 'bg-dev-bg/98 backdrop-blur-xl' : 'bg-white/98 backdrop-blur-xl'
             }`}
           >
-            {/* Header bar inside overlay */}
             <div className="flex items-center justify-between px-5 h-16 sm:h-[4.5rem]">
-              <button
-                onClick={() => {
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  setMobileMenuOpen(false);
-                }}
-                className="flex items-center group"
-              >
+              <a href="/" onClick={scrollToTop} className="flex items-center group">
                 <picture>
                   <source srcSet={logoWebp} type="image/webp" />
                   <img
@@ -196,7 +198,7 @@ const Header = ({ isDevMode, toggleMode }) => {
                     className="h-10 sm:h-11 w-auto object-contain transition-transform duration-500 group-hover:scale-105"
                   />
                 </picture>
-              </button>
+              </a>
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className={`p-2 rounded-full transition-colors duration-300 ${
@@ -210,7 +212,6 @@ const Header = ({ isDevMode, toggleMode }) => {
               </button>
             </div>
 
-            {/* Nav links — only show in normal mode */}
             {isDevMode ? (
               <div className="flex-1 flex flex-col items-center justify-center gap-6">
                 <motion.div
@@ -231,10 +232,12 @@ const Header = ({ isDevMode, toggleMode }) => {
                 </motion.div>
               </div>
             ) : (
-              <nav className="flex-1 flex flex-col items-center justify-center gap-8 sm:gap-10">
-                {navLinks.map((link, i) => (
-                  <motion.button
-                    key={link.id}
+              <nav className="flex-1 flex flex-col items-center justify-center gap-7 sm:gap-8">
+                {NAV_LINKS.map((link, i) => (
+                  <motion.a
+                    key={link.section}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
@@ -242,39 +245,45 @@ const Header = ({ isDevMode, toggleMode }) => {
                       delay: 0.1 + i * 0.08,
                       ease: [0.25, 0.1, 0.25, 1],
                     }}
-                    onClick={() => scrollToSection(link.id)}
                     className="group text-center"
                   >
                     <span className="block text-[10px] uppercase tracking-[0.3em] font-medium mb-2 text-os-muted">
                       0{i + 1}
                     </span>
-                    <span className="text-4xl sm:text-5xl font-display font-bold tracking-tight text-os-text group-hover:text-os-muted transition-colors duration-300">
+                    <span
+                      className={`text-4xl sm:text-5xl font-display font-bold tracking-tight transition-colors duration-300 ${
+                        activeSection === link.section
+                          ? 'text-os-muted'
+                          : 'text-os-text group-hover:text-os-muted'
+                      }`}
+                    >
                       {link.label}
                     </span>
-                  </motion.button>
+                  </motion.a>
                 ))}
               </nav>
             )}
 
-            {/* Footer of mobile menu */}
-            <div className="px-5 py-6 flex items-center justify-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  toggleMode();
-                  setMobileMenuOpen(false);
-                }}
-                className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-[10px] uppercase tracking-[0.15em] font-medium font-display transition-all duration-300 ${
-                  isDevMode
-                    ? 'border border-dev-green text-dev-green hover:bg-dev-green hover:text-black'
-                    : 'border border-os-border text-os-muted hover:border-os-text hover:text-os-text hover:bg-os-text hover:text-white'
-                }`}
-              >
-                <FaCode size={11} />
-                <span>{isDevMode ? 'Passer en mode Normal' : 'Passer en mode Dev'}</span>
-              </motion.button>
-            </div>
+            {toggleMode && (
+              <div className="px-5 py-6 flex items-center justify-center">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    toggleMode();
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-[10px] uppercase tracking-[0.15em] font-medium font-display transition-all duration-300 ${
+                    isDevMode
+                      ? 'border border-dev-green text-dev-green hover:bg-dev-green hover:text-black'
+                      : 'border border-os-border text-os-muted hover:border-os-text hover:text-os-text'
+                  }`}
+                >
+                  <FaCode size={11} />
+                  <span>{isDevMode ? 'Passer en mode Normal' : 'Passer en mode Dev'}</span>
+                </motion.button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

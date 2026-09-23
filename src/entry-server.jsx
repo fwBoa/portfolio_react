@@ -4,14 +4,19 @@ import App from './App.jsx';
 /**
  * Point d'entrée SSR — utilisé uniquement au build par scripts/prerender.mjs.
  *
- * Le rendu produit le HTML dans son état initial (les animations Framer Motion
- * étant à leur valeur d'entrée). Le texte est donc présent dans le HTML servi,
- * ce qui le rend lisible par les robots qui n'exécutent pas le JavaScript
- * (GPTBot, OAI-SearchBot, PerplexityBot, ClaudeBot...).
+ * `location` est transmise à l'application pour que le routeur rende la bonne
+ * page. C'est ce qui permet de figer chaque route en HTML indépendamment :
+ * /, /blog, /blog/<slug>.
  *
- * Côté navigateur, React prend ensuite le relais via hydrateRoot : le DOM
- * pré-rendu est réutilisé, le comportement visuel reste inchangé.
+ * `data` est ce que la page affichera : la liste des notes pour /blog,
+ * l'article et ses voisins pour /blog/<slug>. Le même objet est sérialisé
+ * dans le HTML (window.__POST_DATA__) puis rendu à l'hydratation — rendu
+ * initial et hydratation ne peuvent pas diverger.
+ *
+ * Le texte est donc présent dans le HTML servi, ce qui le rend lisible par les
+ * robots qui n'exécutent pas le JavaScript (GPTBot, OAI-SearchBot,
+ * PerplexityBot, ClaudeBot).
  */
-export function render() {
-  return renderToString(<App />);
+export function render(location = '/', data = null) {
+  return renderToString(<App ssrPath={location} data={data} />);
 }

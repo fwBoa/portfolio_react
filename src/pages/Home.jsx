@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import Header from '../components/Header';
+import Layout from '../components/layout/Layout';
 import ToggleFace from '../components/ToggleFace';
 import Face from '../components/Face';
 import DevFace from '../components/DevFace';
+import useScrollSpy from '../hooks/useScrollSpy';
+
+/**
+ * Sections de l'accueil, dans l'ordre où elles apparaissent.
+ * Elles servent au repérage de la section active dans l'en-tête.
+ */
+const SECTION_IDS = ['about', 'skills', 'contact'];
 
 const konamiSequence = [
   'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
@@ -14,6 +21,7 @@ const konamiSequence = [
 const Home = () => {
   const [isDevMode, setIsDevMode] = useState(false);
   const [konamiCode, setKonamiCode] = useState([]);
+  const activeSection = useScrollSpy(SECTION_IDS);
 
   const toggleMode = () => {
     setIsDevMode((prev) => {
@@ -61,14 +69,13 @@ const Home = () => {
   }, [isDevMode]);
 
   return (
-    <div className={`min-h-screen ${isDevMode ? 'bg-dev-bg text-dev-text' : 'bg-os-bg text-os-text'}`}>
-      <Header isDevMode={isDevMode} toggleMode={toggleMode} />
+    <Layout isDevMode={isDevMode} toggleMode={toggleMode} activeSection={activeSection}>
       <AnimatePresence mode="wait">
         <ToggleFace isDevMode={isDevMode}>
           {isDevMode ? <DevFace /> : <Face />}
         </ToggleFace>
       </AnimatePresence>
-    </div>
+    </Layout>
   );
 };
 
