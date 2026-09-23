@@ -50,9 +50,6 @@ const Article = ({ post, neighbours }) => {
           {/* 2. En-tête de la note */}
           <header className="note-enter mb-12 sm:mb-16" style={{ animationDelay: '0.08s' }}>
             <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 mb-8">
-              <span className="font-display font-medium text-xs text-os-muted">
-                Note {String(post.note_number).padStart(3, '0')}
-              </span>
               <time
                 dateTime={new Date(post.published_at).toISOString()}
                 className="text-[11px] uppercase tracking-[0.15em] text-os-muted font-medium"

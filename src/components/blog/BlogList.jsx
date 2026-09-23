@@ -50,9 +50,6 @@ const BlogList = ({ posts }) => {
           <a href={`/blog/${post.slug}`} className="group block">
             {/* Métadonnées de la note */}
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2">
-              <span className="font-display font-medium text-[11px] text-os-muted">
-                Note {String(post.note_number).padStart(3, '0')}
-              </span>
               <time
                 dateTime={new Date(post.published_at).toISOString()}
                 className="text-[11px] uppercase tracking-[0.15em] text-os-muted font-medium"

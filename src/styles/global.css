@@ -239,6 +239,88 @@ body {
   height: auto;
 }
 
+/* ── Tableaux ───────────────────────────────────────────────────────────
+   Un tableau GFM arrive sans aucun style : bordures invisibles, colonnes
+   collées, en-tête indistinct du corps. Il faut donc le poser entièrement.
+
+   Défilement horizontal sur mobile plutôt que compression : un tableau de
+   quatre colonnes écrasé dans 350 px devient illisible. */
+.article-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;      /* 15px — un cran sous le corps, pour la densité */
+  display: block;            /* nécessaire pour overflow sur un tableau */
+  overflow-x: auto;
+  white-space: nowrap;       /* une cellule ne se coupe pas en plein mot */
+}
+
+@media (min-width: 640px) {
+  .article-body table {
+    display: table;
+    white-space: normal;
+  }
+}
+
+.article-body th,
+.article-body td {
+  border: 1px solid #d0e0e0;
+  padding: 0.625rem 0.875rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.article-body th {
+  background: #f0f5f5;
+  font-family: 'Syne', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  color: #2d6b6b;
+}
+
+/* L'alignement demandé dans le markdown (`:---:`, `---:`) est porté par un
+   attribut `align` que DOMPurify conserve ; on le traduit ici, car il n'a
+   plus d'effet en CSS moderne. */
+.article-body th[align='center'],
+.article-body td[align='center'] {
+  text-align: center;
+}
+.article-body th[align='right'],
+.article-body td[align='right'] {
+  text-align: right;
+}
+
+/* Bloc dépliable : rare, mais utile pour un détail qu'on ne veut pas imposer
+   à la lecture. */
+.article-body details {
+  border: 1px solid #d0e0e0;
+  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
+}
+
+.article-body summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: #2d6b6b;
+}
+
+.article-body details[open] summary {
+  margin-bottom: 0.75rem;
+}
+
+/* Vidéo : même traitement que les images. */
+.article-body video {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Listes de tâches GFM : la case est déjà rendue par le navigateur, on
+   s'assure juste qu'elle ne casse pas l'alignement du texte. */
+.article-body li > input[type='checkbox'] {
+  margin-right: 0.5em;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

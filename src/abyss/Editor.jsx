@@ -186,10 +186,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
 
           <span className="flex-1 text-xs text-os-muted truncate">
             {isPublished ? (
-              <>
-                Note {String(post.note_number).padStart(3, '0')} · publiée le{' '}
-                {fmtDate(post.published_at)}
-              </>
+              <>Publiée le {fmtDate(post.published_at)}</>
             ) : (
               'Brouillon — invisible sur le site'
             )}

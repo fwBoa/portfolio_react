@@ -113,10 +113,6 @@ const Section = ({ title, hint, posts, onOpen }) => {
               onClick={() => onOpen(post)}
               className="w-full text-left py-4 flex flex-wrap items-baseline gap-x-4 gap-y-1 group"
             >
-              <span className="font-display font-medium text-[11px] text-os-muted w-16 flex-shrink-0">
-                {post.note_number ? `Note ${String(post.note_number).padStart(3, '0')}` : '—'}
-              </span>
-
               <span className="flex-1 min-w-[200px] text-base font-display font-bold text-os-text group-hover:text-os-body transition-colors duration-300">
                 {post.title}
               </span>

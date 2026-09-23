@@ -65,7 +65,12 @@ const renderMarkdown = (markdown) => {
   );
   return domPurify.sanitize(marked.parse(withShiftedHeading), {
     ADD_ATTR: ['target'], // liens externes ouverts dans un nouvel onglet
+    // `FORBID_TAGS` interdit la BALISE <style> ; il ne dit rien de l'ATTRIBUT
+    // style="…", qui passait donc — vérifié en test. `FORBID_ATTR` ferme cette
+    // voie : sans lui, une note pourrait imposer sa propre mise en forme, et
+    // rien ne garantirait plus que deux articles se ressemblent.
     FORBID_TAGS: ['style'],
+    FORBID_ATTR: ['style'],
   });
 };
 

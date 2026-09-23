@@ -61,7 +61,7 @@ const notesSection = async () => {
 
   const entries = posts
     .map(
-      (post) => `- **Note ${String(post.note_number).padStart(3, '0')} — ${post.title}**${
+      (post) => `- **${post.title}**${
         post.theme ? ` · ${post.theme}` : ''
       } (${fmtDate(post.published_at)}${
         post.reading_minutes ? `, ${post.reading_minutes} min de lecture` : ''
