@@ -68,7 +68,7 @@ const PostList = ({ posts, loading, onOpen, onRefresh }) => {
 
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-8">
         {loading ? (
-          <p className="text-sm text-os-muted">Chargement…</p>
+          <p className="text-sm text-os-body">Chargement…</p>
         ) : posts.length === 0 ? (
           <p className="text-sm text-os-reading">
             Aucune note. La première arrive.
@@ -101,9 +101,9 @@ const Section = ({ title, hint, posts, onOpen }) => {
     <section>
       <div className="mb-4">
         <h2 className="text-[11px] uppercase tracking-[0.15em] font-medium text-os-text">
-          {title} <span className="text-os-muted">· {posts.length}</span>
+          {title} <span className="text-os-body">· {posts.length}</span>
         </h2>
-        <p className="text-xs text-os-muted mt-1">{hint}</p>
+        <p className="text-xs text-os-body mt-1">{hint}</p>
       </div>
 
       <ul className="border-t border-os-border">
@@ -123,14 +123,14 @@ const Section = ({ title, hint, posts, onOpen }) => {
                 </span>
               )}
 
-              <span className="text-[11px] text-os-muted">
+              <span className="text-[11px] text-os-body">
                 {post.status === 'published'
                   ? `publiée ${fmtDate(post.published_at)}`
                   : `modifiée ${fmtDate(post.updated_at)}`}
               </span>
 
               {post.reading_minutes && (
-                <span className="text-[11px] text-os-muted">
+                <span className="text-[11px] text-os-body">
                   {post.reading_minutes} min
                 </span>
               )}

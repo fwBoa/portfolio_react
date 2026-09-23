@@ -25,7 +25,7 @@ const reveal = {
 
 const Blog = ({ posts }) => (
   <Layout activeSection="notes">
-    <main className="flex-1 bg-os-bg text-os-text pt-20 overflow-x-hidden">
+    <main id="main" className="flex-1 bg-os-bg text-os-text pt-20 overflow-x-hidden">
       <div className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 py-16 sm:py-24">
       {/* En-tête du blog */}
       <motion.div

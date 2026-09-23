@@ -14,6 +14,13 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Cibles d'ancre : `#about`, `#skills`, `#contact` et le lien d'évitement
+   arrivent sinon SOUS l'en-tête fixe, qui mesure 5rem. */
+#main,
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: #ffffff;
@@ -50,10 +57,47 @@ body {
   background: #00ff41;
 }
 
-/* Smooth focus transitions */
+/* Smooth focus transitions.
+   2px et non 1px : à 1px le contour se confond avec un liseré de bordure sur
+   les écrans denses, et l'indicateur de focus devient difficile à repérer.
+   C'est le seul repère dont dispose une personne qui navigue au clavier. */
 *:focus-visible {
-  outline: 1px solid #2d6b6b;
+  outline: 2px solid #2d6b6b;
   outline-offset: 2px;
+}
+
+/* Le mode Dev pose un fond presque noir (#0a0a0a) : le sarcelle y tombe à
+   2,4:1 et disparaîtrait. Le vert du terminal donne 14,5:1. */
+[data-dev='true'] *:focus-visible {
+  outline-color: #00ff41;
+}
+
+/* Lien d'évitement (WCAG 2.4.1).
+   Placé hors écran par une transformation, et non par `display: none` ou
+   `visibility: hidden` : ces deux propriétés le retireraient de l'ordre de
+   tabulation, c'est-à-dire précisément ce qu'il doit occuper. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10000;
+  padding: 0.75rem 1.25rem;
+  background: #2d6b6b;
+  color: #ffffff;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transform: translateY(-200%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+[data-dev='true'] .skip-link {
+  background: #00ff41;
+  color: #0a0a0a;
 }
 
 /* Remove default tap highlight on mobile */
@@ -321,11 +365,30 @@ body {
   margin-right: 0.5em;
 }
 
-/* Reduced motion */
+/* Reduced motion
+   ────────────────────────────────────────────────────────────────────────
+   Deux mécanismes, parce qu'aucun ne couvre l'autre.
+
+   1. Cette règle CSS traite les animations et transitions CSS (note-enter,
+      animate-blink, hover, transitions de couleur).
+
+   2. Les animations Framer Motion ne passent PAS par le CSS : elles sont
+      écrites en styles inline via l'API Web Animations. Cette règle ne les
+      atteint donc pas — c'est `MotionConfig reducedMotion="user"` qui s'en
+      charge, dans App.jsx.
+
+   `animation-iteration-count: 1` est indispensable, et son absence était un
+   vrai défaut : `.animate-blink` tourne en `infinite`. Sans cette ligne, la
+   durée tombait à 0,01 ms mais la boucle continuait — le curseur du terminal
+   aurait clignoté des milliers de fois par seconde, ce qui est bien pire que
+   l'animation d'origine. Réduire la durée ne suffit pas, il faut aussi
+   arrêter la répétition. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
   html {
     scroll-behavior: auto;

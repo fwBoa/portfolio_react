@@ -52,7 +52,7 @@ const BlogList = ({ posts }) => {
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2">
               <time
                 dateTime={new Date(post.published_at).toISOString()}
-                className="text-[11px] uppercase tracking-[0.15em] text-os-muted font-medium"
+                className="text-[11px] uppercase tracking-[0.15em] text-os-body font-medium"
               >
                 {fmtDate(post.published_at)}
               </time>
@@ -62,7 +62,7 @@ const BlogList = ({ posts }) => {
                 </span>
               )}
               {post.reading_minutes && (
-                <span className="text-[11px] text-os-muted ml-auto">
+                <span className="text-[11px] text-os-body ml-auto">
                   {post.reading_minutes} min
                 </span>
               )}
@@ -78,7 +78,7 @@ const BlogList = ({ posts }) => {
               </p>
             )}
 
-            <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted group-hover:text-os-text transition-colors duration-300">
+            <span className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] font-medium text-os-body group-hover:text-os-text transition-colors duration-300">
               Lire la note
               <FaArrowRight
                 size={10}

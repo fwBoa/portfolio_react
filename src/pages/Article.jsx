@@ -34,13 +34,15 @@ const Article = ({ post, neighbours }) => {
 
   return (
     <Layout activeSection="notes">
-      <main className="flex-1 bg-os-bg text-os-text pt-20 overflow-x-hidden">
+      <main id="main" className="flex-1 bg-os-bg text-os-text pt-20 overflow-x-hidden">
         <article className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 py-16 sm:py-24">
         {/* 1. Barre de retour */}
         <div className="note-enter mb-14 sm:mb-16">
+          {/* `py-1.5` porte la cible à ~25px : le libellé en text-[11px] ne
+              fait que 13px de haut, sous le minimum de 24px (WCAG 2.2). */}
           <a
             href="/blog"
-            className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted hover:text-os-text transition-colors duration-300"
+            className="inline-flex items-center gap-2 py-1.5 text-[11px] uppercase tracking-[0.15em] font-medium text-os-body hover:text-os-text transition-colors duration-300"
           >
             ← Toutes les notes
           </a>
@@ -52,7 +54,7 @@ const Article = ({ post, neighbours }) => {
             <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2 mb-8">
               <time
                 dateTime={new Date(post.published_at).toISOString()}
-                className="text-[11px] uppercase tracking-[0.15em] text-os-muted font-medium"
+                className="text-[11px] uppercase tracking-[0.15em] text-os-body font-medium"
               >
                 {fmtDate(post.published_at)}
               </time>
@@ -62,7 +64,7 @@ const Article = ({ post, neighbours }) => {
                 </span>
               )}
               {post.reading_minutes && (
-                <span className="text-[11px] text-os-muted ml-auto">
+                <span className="text-[11px] text-os-body ml-auto">
                   {post.reading_minutes} min de lecture
                 </span>
               )}
@@ -105,7 +107,7 @@ const Article = ({ post, neighbours }) => {
           <div>
             {previous && (
               <a href={`/blog/${previous.slug}`} className="group block">
-                <span className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+                <span className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
                   Note précédente
                 </span>
                 <span className="text-lg font-display font-bold text-os-text group-hover:text-os-body transition-colors duration-300">
@@ -117,7 +119,7 @@ const Article = ({ post, neighbours }) => {
           <div className="sm:text-right">
             {next && (
               <a href={`/blog/${next.slug}`} className="group block">
-                <span className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+                <span className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
                   Note suivante
                 </span>
                 <span className="text-lg font-display font-bold text-os-text group-hover:text-os-body transition-colors duration-300">

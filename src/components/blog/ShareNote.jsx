@@ -89,7 +89,7 @@ const ShareNote = ({ post }) => {
   return (
     <div className="max-w-[68ch] mx-auto">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-        <span className="text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted">
+        <span className="text-[11px] uppercase tracking-[0.15em] font-medium text-os-body">
           Partager
         </span>
 
@@ -124,7 +124,7 @@ const ShareNote = ({ post }) => {
 
         {/* Région annoncée aux lecteurs d'écran : le changement d'icône seul
             ne dit rien à qui ne voit pas l'écran. */}
-        <span aria-live="polite" className="text-[11px] text-os-muted">
+        <span aria-live="polite" className="text-[11px] text-os-body">
           {copied ? 'Lien copié' : ''}
         </span>
       </div>
@@ -142,7 +142,7 @@ const ShareNote = ({ post }) => {
             onFocus={(event) => event.target.select()}
             className="w-full px-3 py-2 text-xs text-os-body bg-os-surface border border-os-border rounded-lg select-all"
           />
-          <p className="mt-1.5 text-[11px] text-os-muted">
+          <p className="mt-1.5 text-[11px] text-os-body">
             Sélectionnez puis copiez l&apos;adresse.
           </p>
         </div>

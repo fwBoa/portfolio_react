@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes } from 'react-icons/fa';
+import useFocusTrap from '../../hooks/useFocusTrap';
 import { site, LEGAL_LAST_UPDATED } from '../../data/site';
 import { legalSections, privacySections } from '../../data/legal';
 
@@ -28,6 +29,9 @@ const legalTabs = [
 const SiteFooter = ({ isDevMode = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeId, setActiveId] = useState('legal');
+  // La modale se superpose à la page : le focus reste dedans tant qu'elle est
+  // ouverte, et revient au bouton qui l'a ouverte ensuite.
+  const modalRef = useFocusTrap(isOpen);
 
   const activeTab = legalTabs.find((tab) => tab.id === activeId) ?? legalTabs[0];
 
@@ -85,12 +89,16 @@ const SiteFooter = ({ isDevMode = false }) => {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
+              {/* `inline-block py-2` : le libellé seul fait 20px de haut, sous
+                  le minimum de 24px exigé par WCAG 2.2 (SC 2.5.8). Le padding
+                  vertical porte la cible à 36px sans déplacer le texte, et
+                  reste invisible puisque la couleur de fond ne change pas. */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-5">
                 <a
                   href={site.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
+                  className="inline-block py-2 text-os-body hover:text-os-text transition-colors duration-300 text-sm"
                 >
                   GitHub
                 </a>
@@ -98,19 +106,19 @@ const SiteFooter = ({ isDevMode = false }) => {
                   href={site.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
+                  className="inline-block py-2 text-os-body hover:text-os-text transition-colors duration-300 text-sm"
                 >
                   LinkedIn
                 </a>
                 <button
                   onClick={() => openLegal('privacy')}
-                  className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
+                  className="inline-block py-2 text-os-body hover:text-os-text transition-colors duration-300 text-sm"
                 >
                   Confidentialité
                 </button>
                 <button
                   onClick={() => openLegal('legal')}
-                  className="text-os-muted hover:text-os-text transition-colors duration-300 text-sm"
+                  className="inline-block py-2 text-os-body hover:text-os-text transition-colors duration-300 text-sm"
                 >
                   Mentions légales
                 </button>
@@ -138,6 +146,7 @@ const SiteFooter = ({ isDevMode = false }) => {
                   className="absolute inset-0 bg-os-text/20 backdrop-blur-sm"
                 />
                 <motion.div
+                  ref={modalRef}
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 40 }}
@@ -169,7 +178,7 @@ const SiteFooter = ({ isDevMode = false }) => {
                             className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-[13px] font-medium transition-colors duration-300 ${
                               isActive
                                 ? 'bg-os-surface text-os-text'
-                                : 'text-os-muted hover:text-os-text'
+                                : 'text-os-body hover:text-os-text'
                             }`}
                           >
                             {tab.label}
@@ -179,7 +188,7 @@ const SiteFooter = ({ isDevMode = false }) => {
                     </div>
                     <button
                       onClick={() => setIsOpen(false)}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-os-border flex items-center justify-center text-os-muted hover:border-os-text hover:text-os-text transition-all duration-300 flex-shrink-0"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-os-border flex items-center justify-center text-os-body hover:border-os-text hover:text-os-text transition-all duration-300 flex-shrink-0"
                       aria-label="Fermer"
                     >
                       <FaTimes size={13} />
@@ -203,16 +212,19 @@ const SiteFooter = ({ isDevMode = false }) => {
                       </div>
                     ))}
                     <div className="pt-3 sm:pt-4 border-t border-os-border">
-                      <p className="text-xs text-os-muted">
+                      <p className="text-xs text-os-body">
                         Dernière mise à jour : {LEGAL_LAST_UPDATED}
                       </p>
                     </div>
                   </div>
 
                   <div className="px-5 sm:px-6 py-3 sm:py-4 border-t border-os-border flex justify-end">
+                    {/* `hover:bg-os-reading` et non `hover:bg-os-muted` :
+                        os-muted est clair (#6b9e9e), le libellé blanc dessus
+                        tombait à 3.00:1 en survol. os-reading donne 7.37:1. */}
                     <button
                       onClick={() => setIsOpen(false)}
-                      className="px-5 sm:px-6 py-2 sm:py-2.5 bg-os-text text-white rounded-lg text-sm font-medium hover:bg-os-muted transition-colors duration-300"
+                      className="px-5 sm:px-6 py-2 sm:py-2.5 bg-os-text text-white rounded-lg text-sm font-medium hover:bg-os-reading transition-colors duration-300"
                     >
                       Fermer
                     </button>

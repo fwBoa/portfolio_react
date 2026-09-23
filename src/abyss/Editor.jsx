@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useDeferredValue } from 'react';
 import { marked } from 'marked';
 import {
   createPost,
@@ -65,22 +65,28 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
   // Le slug suit le titre jusqu'à la première modification manuelle.
   const effectiveSlug = slugTouched ? slug : slugify(title);
 
-  // Rendu de l'aperçu. Le calcul est refait à chaque frappe : sur un article
-  // de quelques milliers de mots, `marked` reste négligeable, et le résultat
-  // est toujours synchrone avec le champ.
+  // Rendu de l'aperçu. Le calcul portait sur chaque frappe (useMemo([content]))
+  // et bloquait la saisie le temps de la conversion.
+  //
+  // `useDeferredValue` demande à React de rendre cet aperçu en priorité basse :
+  // le champ se met à jour immédiatement, la conversion suit. Mieux qu'un
+  // délai fixe, React abandonne le calcul différé dès qu'une nouvelle frappe
+  // arrive — les conversions intermédiaires sont donc sautées pendant une
+  // saisie continue, sans minuterie à régler ni à maintenir.
   //
   // Le `# titre` en tête est rétrogradé en `##`, exactement comme le fait
   // scripts/prerender.mjs au build. Sans cela, l'aperçu montrerait deux titres
   // de niveau 1 et ne représenterait pas ce qui sera réellement publié — la
   // page publique n'a qu'un seul h1, le sien.
+  const deferredContent = useDeferredValue(content);
   const previewHtml = useMemo(() => {
     try {
-      const source = (content || '').replace(/^\s*#\s+(.+)$/m, '## $1');
+      const source = (deferredContent || '').replace(/^\s*#\s+(.+)$/m, '## $1');
       return marked.parse(source || '_Rien à prévisualiser pour l\'instant._');
     } catch {
       return '<p>Aperçu indisponible.</p>';
     }
-  }, [content]);
+  }, [deferredContent]);
 
   /** Enregistre sans publier. */
   const save = async () => {
@@ -170,7 +176,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
   };
 
   const fieldClass =
-    'w-full px-4 py-2.5 bg-white border border-os-border rounded-lg text-os-text text-sm outline-none focus:border-os-text transition-colors duration-300 disabled:opacity-50';
+    'w-full px-4 py-2.5 bg-white border border-os-border rounded-lg text-os-text text-sm focus:border-os-text transition-colors duration-300 disabled:opacity-50';
 
   return (
     <div className="min-h-screen bg-os-bg text-os-text">
@@ -179,12 +185,12 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
         <div className="max-w-[1600px] mx-auto px-5 sm:px-8 py-3 flex flex-wrap items-center gap-3">
           <button
             onClick={onCancel}
-            className="text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted hover:text-os-text transition-colors duration-300"
+            className="py-2 text-[11px] uppercase tracking-[0.15em] font-medium text-os-body hover:text-os-text transition-colors duration-300"
           >
             ← Retour
           </button>
 
-          <span className="flex-1 text-xs text-os-muted truncate">
+          <span className="flex-1 text-xs text-os-body truncate">
             {isPublished ? (
               <>Publiée le {fmtDate(post.published_at)}</>
             ) : (
@@ -196,7 +202,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
             <button
               onClick={remove}
               disabled={pending}
-              className="px-3 py-2 text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted hover:text-red-700 transition-colors duration-300 disabled:opacity-40"
+              className="px-3 py-2 text-[11px] uppercase tracking-[0.15em] font-medium text-os-body hover:text-red-700 transition-colors duration-300 disabled:opacity-40"
             >
               Supprimer
             </button>
@@ -235,7 +241,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
         {/* ---------------- Colonne de saisie ---------------- */}
         <div className="space-y-6">
           <div>
-            <label htmlFor="f-title" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+            <label htmlFor="f-title" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
               Titre
             </label>
             <input
@@ -249,7 +255,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="f-slug" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+              <label htmlFor="f-slug" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
                 Lien permanent
               </label>
               <input
@@ -262,13 +268,13 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
                 placeholder="derive-du-titre"
                 className={`${fieldClass} text-xs`}
               />
-              <p className="mt-1.5 text-[11px] text-os-muted truncate">
+              <p className="mt-1.5 text-[11px] text-os-body truncate">
                 zamblezie.fr/blog/{effectiveSlug || '…'}
               </p>
             </div>
 
             <div>
-              <label htmlFor="f-theme" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+              <label htmlFor="f-theme" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
                 Thème
               </label>
               <select
@@ -288,7 +294,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
           </div>
 
           <div>
-            <label htmlFor="f-summary" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+            <label htmlFor="f-summary" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
               Résumé — affiché dans la liste et sous le titre
             </label>
             <textarea
@@ -302,7 +308,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
           </div>
 
           <div>
-            <label htmlFor="f-content" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+            <label htmlFor="f-content" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
               Contenu — markdown
             </label>
             <textarea
@@ -316,12 +322,12 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
           </div>
 
           <details className="border border-os-border rounded-lg">
-            <summary className="px-4 py-3 text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted cursor-pointer hover:text-os-text transition-colors duration-300">
+            <summary className="px-4 py-3 text-[11px] uppercase tracking-[0.15em] font-medium text-os-body cursor-pointer hover:text-os-text transition-colors duration-300">
               Référencement (facultatif)
             </summary>
             <div className="px-4 pb-4 space-y-4">
               <div>
-                <label htmlFor="f-meta-title" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+                <label htmlFor="f-meta-title" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
                   Titre dans les résultats — {metaTitle.length}/70
                 </label>
                 <input
@@ -333,7 +339,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
                 />
               </div>
               <div>
-                <label htmlFor="f-meta-desc" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+                <label htmlFor="f-meta-desc" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
                   Description dans les résultats — {metaDescription.length}/200
                 </label>
                 <textarea
@@ -346,7 +352,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
                 />
               </div>
               <div>
-                <label htmlFor="f-og-image" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-2">
+                <label htmlFor="f-og-image" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
                   Image de partage — URL complète
                 </label>
                 <input
@@ -356,7 +362,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
                   placeholder="https://zamblezie.fr/og-image.png"
                   className={fieldClass}
                 />
-                <p className="mt-1.5 text-[11px] text-os-muted leading-relaxed">
+                <p className="mt-1.5 text-[11px] text-os-body leading-relaxed">
                   Format attendu : 1200 × 630. Laissée vide, l'image du site est
                   utilisée — ce qui convient à la plupart des notes.
                 </p>
@@ -367,7 +373,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
 
         {/* ---------------- Colonne d'aperçu ---------------- */}
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <span className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-4">
+          <span className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-4">
             Aperçu
           </span>
           {/* L'aperçu reprend la typographie de lecture de la page publique

@@ -111,7 +111,7 @@ const AdminApp = () => {
 
   if (checking) {
     return (
-      <div className="min-h-screen bg-os-bg text-os-muted flex items-center justify-center text-sm">
+      <div className="min-h-screen bg-os-bg text-os-body flex items-center justify-center text-sm">
         Vérification de la session…
       </div>
     );
@@ -153,19 +153,19 @@ const AdminApp = () => {
         <div className="pt-6 border-t border-os-border flex flex-wrap items-center gap-6">
           <a
             href="/"
-            className="text-xs text-os-muted hover:text-os-text transition-colors duration-300"
+            className="py-2 text-xs text-os-body hover:text-os-text transition-colors duration-300"
           >
             Voir le site
           </a>
           <a
             href="/blog"
-            className="text-xs text-os-muted hover:text-os-text transition-colors duration-300"
+            className="py-2 text-xs text-os-body hover:text-os-text transition-colors duration-300"
           >
             Voir le blog
           </a>
           <button
             onClick={handleLogout}
-            className="text-xs text-os-muted hover:text-red-700 transition-colors duration-300"
+            className="py-2 text-xs text-os-body hover:text-red-700 transition-colors duration-300"
           >
             Se déconnecter
           </button>

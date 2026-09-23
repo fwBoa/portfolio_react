@@ -31,7 +31,9 @@ const itemVariants = {
 
 const DevFace = () => {
   return (
-    <div className="min-h-screen bg-dev-bg text-dev-green font-mono pt-20 overflow-x-hidden">
+    /* Le mode Dev n'avait aucun landmark principal : le contenu n'était
+       annoncé nulle part. C'est aussi la cible du lien d'évitement. */
+    <main id="main" className="min-h-screen bg-dev-bg text-dev-green font-mono pt-20 overflow-x-hidden">
       <div className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 py-12 sm:py-16 lg:py-20">
         {/* Masthead */}
         <motion.div
@@ -139,7 +141,7 @@ const DevFace = () => {
           </div>
         </motion.div>
       </div>
-    </div>
+    </main>
   );
 };
 

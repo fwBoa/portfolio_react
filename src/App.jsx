@@ -1,4 +1,5 @@
 import { Router, Switch, Route } from 'wouter';
+import { MotionConfig } from 'framer-motion';
 import Home from './pages/Home';
 import Blog from './pages/Blog';
 import Article from './pages/Article';
@@ -25,26 +26,36 @@ import { Analytics } from '@vercel/analytics/react';
  * Les liens entre pages sont des <a> classiques : chaque note est un
  * fichier statique distinct, la navigation recharge une page complète —
  * simple, sans état client à synchroniser.
+ *
+ * `MotionConfig reducedMotion="user"` : une seule ligne qui couvre les ~95
+ * animations Framer du site. Quand le système demande moins de mouvement,
+ * Framer désactive les animations de transform et de layout (déplacements,
+ * rotations, translations) et ne conserve que les fondus d'opacité — qui ne
+ * provoquent pas de trouble vestibulaire. C'est la seule façon d'atteindre
+ * Framer : il écrit ses animations en styles inline via l'API Web Animations,
+ * la règle CSS `prefers-reduced-motion` de global.css ne le touche pas.
  */
 const App = ({ ssrPath, data = null }) => (
-  <Router ssrPath={ssrPath}>
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/blog">
-        <Blog posts={data?.posts ?? []} />
-      </Route>
-      <Route path="/blog/:slug">
-        {(params) => {
-          if (!data?.post || data.post.slug !== params.slug) return <NotFound />;
-          return <Article post={data.post} neighbours={data.neighbours} />;
-        }}
-      </Route>
-      <Route>
-        <NotFound />
-      </Route>
-    </Switch>
-    <Analytics />
-  </Router>
+  <MotionConfig reducedMotion="user">
+    <Router ssrPath={ssrPath}>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/blog">
+          <Blog posts={data?.posts ?? []} />
+        </Route>
+        <Route path="/blog/:slug">
+          {(params) => {
+            if (!data?.post || data.post.slug !== params.slug) return <NotFound />;
+            return <Article post={data.post} neighbours={data.neighbours} />;
+          }}
+        </Route>
+        <Route>
+          <NotFound />
+        </Route>
+      </Switch>
+      <Analytics />
+    </Router>
+  </MotionConfig>
 );
 
 /**

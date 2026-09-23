@@ -57,7 +57,7 @@ const Face = () => {
   const avatarY = useSpring(rawAvatarY, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
   return (
-    <main className="bg-os-bg text-os-text pt-20 overflow-x-hidden">
+    <main id="main" className="bg-os-bg text-os-text pt-20 overflow-x-hidden">
       <div className="grain-overlay" />
 
       {/* ===== HERO ===== */}
@@ -124,7 +124,7 @@ const Face = () => {
               download="cv_jeandavidzamblezie.pdf"
               className="group flex items-center gap-3 text-sm font-medium"
             >
-              <span className="border-b border-os-text pb-0.5 group-hover:text-os-muted group-hover:border-os-muted transition-colors duration-500">
+              <span className="border-b border-os-text pb-0.5 group-hover:text-os-body group-hover:border-os-body transition-colors duration-500">
                 Télécharger le CV
               </span>
               <span className="w-9 h-9 rounded-full border border-os-border flex items-center justify-center group-hover:border-os-text group-hover:bg-os-text group-hover:text-white transition-all duration-500">
@@ -287,7 +287,7 @@ const Face = () => {
                     <link.icon size={18} />
                   </span>
                   <div className="flex-1 min-w-0">
-                    <span className="text-xs sm:text-sm text-os-muted block mb-0.5">
+                    <span className="text-xs sm:text-sm text-os-body block mb-0.5">
                       {link.label}
                     </span>
                     <span className="text-lg sm:text-xl lg:text-2xl text-os-text group-hover:text-os-text transition-colors duration-500 truncate block font-medium">

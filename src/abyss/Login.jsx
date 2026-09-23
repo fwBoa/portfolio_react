@@ -47,7 +47,7 @@ const Login = ({ onSuccess }) => {
         <form onSubmit={handleSubmit}>
           <label
             htmlFor="admin-password"
-            className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-muted mb-3"
+            className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-3"
           >
             Mot de passe
           </label>
@@ -60,7 +60,7 @@ const Login = ({ onSuccess }) => {
             // Le focus est placé d'emblée : c'est le seul champ de la page.
             autoFocus
             disabled={pending}
-            className="w-full px-4 py-3 bg-os-surface border border-os-border rounded-lg text-os-text text-base outline-none focus:border-os-text transition-colors duration-300 disabled:opacity-50"
+            className="w-full px-4 py-3 bg-os-surface border border-os-border rounded-lg text-os-text text-base focus:border-os-text transition-colors duration-300 disabled:opacity-50"
           />
 
           {error && (

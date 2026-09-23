@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCode, FaBars, FaTimes } from 'react-icons/fa';
+import useFocusTrap from '../../hooks/useFocusTrap';
 import logo from '../../assets/Img/logo.png';
 import logoWebp from '../../assets/Img/logo.webp';
 
@@ -33,9 +34,24 @@ const NAV_LINKS = [
 const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Le menu recouvre la page : le focus doit y être enfermé tant qu'il est
+  // ouvert, et revenir au bouton d'ouverture à la fermeture.
+  const mobileMenuRef = useFocusTrap(mobileMenuOpen);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    // L'état ne bascule qu'au franchissement du seuil, dans un sens ou dans
+    // l'autre. La version précédente écrivait `window.scrollY > 40` à chaque
+    // événement de défilement : la valeur était la plupart du temps identique,
+    // mais il fallait tout de même traverser la mise à jour d'état de React
+    // des dizaines de fois par seconde.
+    let wasScrolled = null;
+    const onScroll = () => {
+      const nowScrolled = window.scrollY > 40;
+      if (nowScrolled === wasScrolled) return;
+      wasScrolled = nowScrolled;
+      setScrolled(nowScrolled);
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
@@ -110,7 +126,7 @@ const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
                       key={link.section}
                       href={link.href}
                       className={`relative px-4 py-2 text-[11px] uppercase tracking-[0.15em] font-medium font-display transition-colors duration-300 rounded-full ${
-                        isActive ? 'text-os-text' : 'text-os-muted hover:text-os-text'
+                        isActive ? 'text-os-text' : 'text-os-body hover:text-os-text'
                       }`}
                     >
                       {link.label}
@@ -146,6 +162,8 @@ const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden p-2 rounded-full transition-colors duration-300"
               aria-label="Ouvrir le menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
             >
               <FaBars size={18} className="text-os-text" />
             </button>
@@ -161,8 +179,8 @@ const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
                   isDevMode
                     ? 'border border-dev-green text-dev-green hover:bg-dev-green hover:text-black'
                     : scrolled
-                      ? 'border border-os-border text-os-muted hover:border-os-text hover:text-os-text'
-                      : 'border border-os-border/50 text-os-muted hover:border-os-text hover:text-os-text'
+                      ? 'border border-os-border text-os-body hover:border-os-text hover:text-os-text'
+                      : 'border border-os-border/50 text-os-body hover:border-os-text hover:text-os-text'
                 }`}
               >
                 <FaCode size={11} />
@@ -178,6 +196,11 @@ const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
         {mobileMenuOpen && (
           <motion.div
             key="mobile-menu"
+            id="mobile-menu"
+            ref={mobileMenuRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de navigation"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -204,7 +227,7 @@ const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
                 className={`p-2 rounded-full transition-colors duration-300 ${
                   isDevMode
                     ? 'text-dev-muted hover:text-dev-green'
-                    : 'text-os-muted hover:text-os-text'
+                    : 'text-os-body hover:text-os-text'
                 }`}
                 aria-label="Fermer le menu"
               >
@@ -247,14 +270,14 @@ const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
                     }}
                     className="group text-center"
                   >
-                    <span className="block text-[10px] uppercase tracking-[0.3em] font-medium mb-2 text-os-muted">
+                    <span className="block text-[10px] uppercase tracking-[0.3em] font-medium mb-2 text-os-body">
                       0{i + 1}
                     </span>
                     <span
                       className={`text-4xl sm:text-5xl font-display font-bold tracking-tight transition-colors duration-300 ${
                         activeSection === link.section
-                          ? 'text-os-muted'
-                          : 'text-os-text group-hover:text-os-muted'
+                          ? 'text-os-body'
+                          : 'text-os-text group-hover:text-os-body'
                       }`}
                     >
                       {link.label}
@@ -276,7 +299,7 @@ const Header = ({ isDevMode = false, toggleMode, activeSection = null }) => {
                   className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-[10px] uppercase tracking-[0.15em] font-medium font-display transition-all duration-300 ${
                     isDevMode
                       ? 'border border-dev-green text-dev-green hover:bg-dev-green hover:text-black'
-                      : 'border border-os-border text-os-muted hover:border-os-text hover:text-os-text'
+                      : 'border border-os-border text-os-body hover:border-os-text hover:text-os-text'
                   }`}
                 >
                   <FaCode size={11} />
