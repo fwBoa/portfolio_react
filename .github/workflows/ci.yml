@@ -1,0 +1,75 @@
+name: CI
+
+# Vérifications automatiques avant qu'un commit n'atteigne la production.
+#
+# Vercel déploie sur `main` sans rien vérifier : ce qui passe le push est en
+# ligne. Cette pipeline comble ce trou. Elle tourne sur chaque poussée vers
+# `main` et sur chaque proposition de fusion, pour qu'une erreur soit vue
+# avant la fusion plutôt qu'après le déploiement.
+#
+# Elle attrape précisément ce qui s'est déjà produit :
+#   - une règle CSS ou un composant qui ne compile plus ;
+#   - une option de build invalide (par exemple un `manualChunks` incompatible
+#     avec le build SSR — survenu le 23/09/2026, le pré-rendu échouait en
+#     silence et le site partait en production privé de son blog) ;
+#   - une régression de mise en forme ou de slug (couvertes par les deux
+#     suites de tests).
+#
+# Ce qu'elle ne couvre pas, faute de base de données : le rendu des articles
+# réels. Le build s'exécute sans `DATABASE_URL`, `listPublished` renvoie une
+# liste vide, et le pré-rendu se limite à l'accueil et à la liste des notes.
+# Pour aller plus loin, ajouter `DATABASE_URL` dans les secrets du dépôt et la
+# transmettre à l'étape « Build » — une base de lecture seule suffit.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Une nouvelle poussée sur la même branche rend la vérification précédente
+# caduque : on l'annule au lieu de la laisser consommer des minutes pour rien.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verification:
+    name: Lint, tests et build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Node
+        uses: actions/setup-node@v4
+        with:
+          # Version figée explicitement : le projet n'en déclare aucune, et
+          # un build qui passe en local sur une version récente peut échouer
+          # sur celle, plus ancienne, que choisirait le runner par défaut.
+          node-version: 22
+          cache: npm
+
+      # `npm ci` et non `npm install` : les dépendances sont installées
+      # exactement telles que le verrou les fixe, sans mise à jour implicite.
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Linter
+        run: npm run lint
+
+      - name: Tests du markdown
+        run: node scripts/markdown-test.mjs
+
+      - name: Tests de l'administration
+        run: npm run admin:test
+
+      # `CI` est déjà positionné par GitHub Actions ; on le réaffirme pour que
+      # le lien avec le comportement de scripts/prerender.mjs soit lisible ici.
+      # C'est cette variable qui fait échouer le build en cas d'échec du
+      # pré-rendu, au lieu de le laisser passer en silence.
+      - name: Build
+        run: npm run build
+        env:
+          CI: 'true'

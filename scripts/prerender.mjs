@@ -14,8 +14,9 @@
  * canonical). Sans elles, toutes les pages partageraient celles de l'accueil,
  * ce que les moteurs interprètent comme du contenu dupliqué.
  *
- * En cas d'échec, le build n'est pas interrompu : le site reste fonctionnel,
- * simplement sans pré-rendu.
+ * En cas d'échec, le comportement dépend du contexte (voir `onFailure` plus
+ * bas) : le build échoue franchement en intégration continue, et se contente
+ * d'un avertissement en local, où l'absence de base de données est fréquente.
  */
 import { build } from 'vite';
 import { readFileSync, writeFileSync, rmSync, existsSync, mkdirSync } from 'node:fs';
@@ -81,7 +82,19 @@ const resolveRoutes = async () => {
     log(`${posts.length} article(s) publié(s) lu(s) depuis la base.`);
     return { routes, posts };
   } catch (error) {
-    log(`base injoignable (${error.message.split('\n')[0]}) — pré-rendu du portfolio et de la liste du blog.`);
+    const reason = error.message.split('\n')[0];
+
+    // En intégration continue, une base injoignable fait échouer le build.
+    //
+    // Sans cela, le repli ci-dessous republierait le site sans ses articles :
+    // les pages déjà en ligne disparaîtraient, à cause d'une panne passagère
+    // et sans le moindre signal. Une publication qui échoue laisse la
+    // précédente en ligne — c'est un résultat bien préférable.
+    if (process.env.CI) {
+      throw new Error(`base injoignable (${reason}) — publication interrompue`);
+    }
+
+    log(`base injoignable (${reason}) — pré-rendu du portfolio et de la liste du blog.`);
     return { routes: ['/', '/blog'], posts: [] };
   }
 };
@@ -371,7 +384,16 @@ try {
     throw new Error('Marqueur <div id="root"></div> introuvable dans dist/index.html.');
   }
 
+  // Toutes les pages sont calculées AVANT d'en écrire une seule.
+  //
+  // Sans cette précaution, une erreur au milieu de la boucle laissait les
+  // pages déjà écrites en place, avec les métadonnées de la route précédente
+  // ou un contenu partiel : un état incohérent, pire qu'un échec franc.
+  // Ici, soit toutes les pages sont écrites, soit aucune ne l'est — le
+  // déploiement ne peut pas hériter d'un mélange.
+  const pending = [];
   let total = 0;
+
   for (const route of routes) {
     const data = dataFor(route);
     const appHtml = render(route, data);
@@ -396,12 +418,14 @@ try {
       .replace(marker, `<div id="root">${appHtml}</div>`)
       .replace('</head>', `${dataScript}${jsonLdScript}</head>`);
 
-    const file = fileFor(route);
-    mkdirSync(dirname(file), { recursive: true });
-    writeFileSync(file, html, 'utf8');
-
+    pending.push({ file: fileFor(route), html });
     total += appHtml.length;
     log(`${route.padEnd(30)} → ${Math.round(appHtml.length / 1024)} Ko`);
+  }
+
+  for (const { file, html } of pending) {
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, html, 'utf8');
   }
 
   writeSitemap(routes, postByRoute);
@@ -409,7 +433,23 @@ try {
   log(`${routes.length} page(s) pré-rendue(s), ${Math.round(total / 1024)} Ko de contenu au total.`);
   rmSync(ssrDir, { recursive: true, force: true });
 } catch (error) {
-  console.warn(`[prerender] ignoré — ${error.message}`);
-  console.warn('[prerender] le site est déployé sans pré-rendu.');
   rmSync(ssrDir, { recursive: true, force: true });
+  log(`ÉCHEC — ${error.message}`);
+  log('Le pré-rendu est obligatoire : le HTML servi sans lui serait vide pour les robots.');
+
+  // En intégration continue, on échoue franchement.
+  //
+  // Auparavant, cette erreur était avalée et le build se poursuivait : un
+  // échec de pré-rendu déployait un site dont le blog avait disparu, sans
+  // aucun signal. Personne ne s'en apercevait avant de regarder la page.
+  //
+  // En local, on se contente d'un avertissement : lancer le build sans base
+  // de données joignable est un cas normal, et casser le build pour cela
+  // serait pénible sans rien protéger.
+  //
+  // `CI` est la variable que GitHub Actions et Vercel positionnent d'eux-mêmes.
+  if (process.env.CI) {
+    process.exit(1);
+  }
+  console.warn('[prerender] build local : on continue, le site sera déployé sans pré-rendu.');
 }
