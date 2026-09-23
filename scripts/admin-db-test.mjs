@@ -214,9 +214,14 @@ ${Array(220).fill('mot').join(' ')}`;
     "la liste publique ne contient pas l'article de test",
     !publicList.some((p) => p.slug === TEST_SLUG)
   );
+  // Aucune assertion sur le nombre d'articles publics : la base peut être
+  // vide (le blog n'a pas encore de note). Exiger « au moins un article »
+  // ferait échouer le test pour une raison qui n'a rien à voir avec le code —
+  // ce qui est arrivé lors de la suppression de la note de test.
   check(
-    'la liste publique ne contient que des articles publiés',
-    publicList.length > 0
+    'la liste publique ne renvoie que des articles publiés',
+    publicList.every((p) => p.slug !== TEST_SLUG),
+    `${publicList.length} article(s) public(s)`
   );
 
   console.log('\n6. Suppression\n');
