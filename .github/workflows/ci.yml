@@ -40,10 +40,10 @@ jobs:
 
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Installer Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           # Version figée explicitement : le projet n'en déclare aucune, et
           # un build qui passe en local sur une version récente peut échouer
