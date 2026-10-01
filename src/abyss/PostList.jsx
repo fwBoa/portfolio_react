@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createPost } from './api';
+import { themeLabels } from '../lib/themes';
 
 /**
  * Liste des notes, brouillons compris.
@@ -117,9 +118,9 @@ const Section = ({ title, hint, posts, onOpen }) => {
                 {post.title}
               </span>
 
-              {post.theme && (
+              {post.theme_slugs?.length > 0 && (
                 <span className="text-[11px] uppercase tracking-[0.15em] text-os-body font-medium">
-                  {post.theme}
+                  {themeLabels(post.theme_slugs).join(' · ')}
                 </span>
               )}
 

@@ -1,4 +1,5 @@
 import { FaArrowRight } from 'react-icons/fa';
+import { themeLabels } from '../../lib/themes';
 
 /**
  * Liste du blog : une frise chronologique, du plus récent au plus ancien.
@@ -56,9 +57,9 @@ const BlogList = ({ posts }) => {
               >
                 {fmtDate(post.published_at)}
               </time>
-              {post.theme && (
+              {post.theme_slugs?.length > 0 && (
                 <span className="text-[11px] uppercase tracking-[0.15em] text-os-body font-medium">
-                  {post.theme}
+                  {themeLabels(post.theme_slugs).join(' · ')}
                 </span>
               )}
               {post.reading_minutes && (

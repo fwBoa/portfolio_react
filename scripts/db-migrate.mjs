@@ -15,12 +15,18 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import pg from 'pg';
+import { Client } from '@neondatabase/serverless';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const schemaPath = join(root, 'src', 'lib', 'schema.sql');
 
-// Migration : connexion directe, pas le pooler.
+// Migration : `DATABASE_URL_UNPOOLED` quand elle existe, car les opérations de
+// schéma prennent des verrous et n'aiment pas passer par un pooler.
+//
+// Le driver est celui de Neon en WebSocket (port 443) : le port 5432 s'est
+// révélé filtré sur certains réseaux le 01/10/2026, ce qui rendait toute
+// migration impossible. Le Client expose la même API que `pg`, y compris pour
+// le SQL multi-instructions dont ce script a besoin.
 const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
 
 if (!url) {
@@ -30,7 +36,7 @@ if (!url) {
 
 const sql = readFileSync(schemaPath, 'utf8');
 
-const client = new pg.Client({
+const client = new Client({
   connectionString: url,
   ssl: { rejectUnauthorized: false },
 });

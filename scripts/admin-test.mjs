@@ -148,6 +148,83 @@ check(
 );
 check('pas de tiret en début ni en fin', !slugify('  --Test--  ').startsWith('-'));
 
+console.log('\n6. Thèmes : validation et normalisation\n');
+
+const { validatePostInput } = await import('../api/_lib/posts-admin.js');
+const { normalizeThemes, unknownThemes, THEME_SLUGS } = await import('../src/lib/themes.js');
+
+const base = { title: 'Titre', content: 'Contenu' };
+const themesDe = (entree) => validatePostInput({ ...base, theme_slugs: entree }).values.theme_slugs;
+const erreursDe = (entree) => validatePostInput({ ...base, theme_slugs: entree }).errors;
+
+// La liste est partagée entre l'éditeur et l'API : sa taille est un fait, pas
+// une supposition. Si un thème est ajouté, ce test le signale — c'est voulu,
+// pour que la décision soit consciente.
+check('sept thèmes déclarés', THEME_SLUGS.length === 7, THEME_SLUGS.join(', '));
+check(
+  'les slugs sont en minuscules et sans accent',
+  THEME_SLUGS.every((slug) => slug === slug.toLowerCase() && /^[a-z]+$/.test(slug)),
+  THEME_SLUGS.join(', ')
+);
+// Un slug présent deux fois fausserait normalizeThemes, qui filtre sur la liste.
+check('aucun slug en double', new Set(THEME_SLUGS).size === THEME_SLUGS.length);
+
+check('un thème valide passe', JSON.stringify(themesDe(['ia'])) === '["ia"]');
+check(
+  'deux thèmes passent',
+  JSON.stringify(themesDe(['ia', 'projets'])) === '["ia","projets"]'
+);
+
+// Le point le plus important de ce bloc : avant, n'importe quelle chaîne
+// entrait en base et créait une catégorie fantôme, sans que rien ne le dise.
+check('un thème inconnu est refusé', erreursDe(['quantique']).length === 1);
+check(
+  'un mélange valide + inconnu est refusé',
+  erreursDe(['ia', 'blabla']).length === 1,
+  erreursDe(['ia', 'blabla'])[0]
+);
+check(
+  'le message nomme le thème fautif',
+  erreursDe(['blabla'])[0]?.includes('blabla'),
+  erreursDe(['blabla'])[0]
+);
+
+check('sans thème, la clé est absente', themesDe(undefined) === undefined);
+check('une liste vide est acceptée', JSON.stringify(themesDe([])) === '[]');
+
+// L'ordre suit la déclaration, pas la saisie : sans cela, deux notes portant
+// les mêmes thèmes pourraient les afficher dans deux ordres différents.
+check(
+  "l'ordre suit la liste, pas la saisie",
+  JSON.stringify(themesDe(['veille', 'ia'])) === '["ia","veille"]',
+  JSON.stringify(themesDe(['veille', 'ia']))
+);
+check(
+  'les doublons sont écartés',
+  JSON.stringify(themesDe(['ia', 'ia', 'dev'])) === '["ia","dev"]'
+);
+check(
+  'la casse est normalisée',
+  JSON.stringify(themesDe(['IA'])) === '["ia"]'
+);
+check(
+  "les espaces autour sont ignorés",
+  JSON.stringify(themesDe([' ia '])) === '["ia"]'
+);
+
+// Rétrocompatibilité : la colonne a été une chaîne unique, une valeur seule
+// peut donc encore arriver d'un client non mis à jour.
+check('une chaîne unique est tolérée', JSON.stringify(themesDe('IA')) === '["ia"]');
+check(
+  'normalizeThemes accepte null',
+  JSON.stringify(normalizeThemes(null)) === '[]'
+);
+check(
+  'unknownThemes ne retient que les inconnus',
+  JSON.stringify(unknownThemes(['ia', 'xyz', 'dev'])) === '["xyz"]',
+  JSON.stringify(unknownThemes(['ia', 'xyz', 'dev']))
+);
+
 console.log(`\n${'─'.repeat(60)}`);
 console.log(`${passed} réussi(s), ${failed} échoué(s)`);
 console.log(`${'─'.repeat(60)}\n`);

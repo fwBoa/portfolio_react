@@ -4,8 +4,9 @@
  *
  *   node --env-file=.env.local scripts/db-inspect.mjs
  */
-import pg from 'pg';
+import { Client } from '@neondatabase/serverless';
 
+// Driver Neon en WebSocket (443) — même raison que dans db-migrate.mjs.
 const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
 
 if (!url) {
@@ -13,7 +14,7 @@ if (!url) {
   process.exit(1);
 }
 
-const client = new pg.Client({
+const client = new Client({
   connectionString: url,
   ssl: { rejectUnauthorized: false },
 });

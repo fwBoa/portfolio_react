@@ -9,10 +9,11 @@
  * requête publique hérite par erreur de la portée élargie.
  *
  * Connexion : `DATABASE_URL` (pooled) convient aux écritures ponctuelles d'un
- * back-office. La connexion directe est réservée aux migrations, qui prennent
- * des verrous et n'aiment pas passer par un pooler.
+ * back-office. Le driver est celui de Neon en WebSocket — voir src/lib/posts.js
+ * pour la raison du choix (le port 5432 est filtré sur certains réseaux).
  */
-import { Pool } from 'pg';
+import { Pool } from '@neondatabase/serverless';
+import { normalizeThemes, unknownThemes, THEME_SLUGS } from '../../src/lib/themes.js';
 
 let pool = null;
 
@@ -31,7 +32,7 @@ function getPool() {
 
 /** Colonnes renvoyées par les listes — le contenu complet est exclu, il est lourd. */
 const LIST_COLUMNS = `
-  id, slug, title, summary, theme, status, note_number,
+  id, slug, title, summary, theme_slugs, status, note_number,
   reading_minutes, published_at, created_at, updated_at,
   meta_title, meta_description, og_image
 `;
@@ -146,10 +147,29 @@ export function validatePostInput(input, { partial = false } = {}) {
     else clean.slug = slug;
   }
 
-  for (const field of ['summary', 'theme', 'meta_title', 'meta_description', 'og_image']) {
+  for (const field of ['summary', 'meta_title', 'meta_description', 'og_image']) {
     if (input[field] !== undefined) {
       const value = input[field] === null ? null : String(input[field]).trim();
       clean[field] = value === '' ? null : value;
+    }
+  }
+
+  // Thèmes : validés contre la liste partagée, jamais acceptés tels quels.
+  //
+  // Avant, n'importe quelle chaîne passait : « ia », « IA » et « Intelligence
+  // Artificielle » auraient créé trois catégories pour un même sujet, sans que
+  // rien ne le signale. La liste vient désormais de src/lib/themes.js, la même
+  // que celle qui alimente l'éditeur — impossible qu'elles divergent.
+  //
+  // Un thème inconnu est REFUSÉ, pas ignoré en silence : la faute vient
+  // presque toujours d'une faute de frappe ou d'un client désynchronisé, et
+  // l'ignorer priverait l'auteur de l'information.
+  if (input.theme_slugs !== undefined) {
+    const inconnus = unknownThemes(input.theme_slugs);
+    if (inconnus.length > 0) {
+      errors.push(`Thème inconnu : ${inconnus.join(', ')}. Attendu : ${THEME_SLUGS.join(', ')}.`);
+    } else {
+      clean.theme_slugs = normalizeThemes(input.theme_slugs);
     }
   }
 
@@ -179,7 +199,7 @@ export async function createPost(values) {
   const readingMinutes = values.reading_minutes ?? estimateReadingMinutes(values.content);
 
   const { rows } = await getPool().query(
-    `insert into posts (slug, title, summary, content, theme, status,
+    `insert into posts (slug, title, summary, content, theme_slugs, status,
                         reading_minutes, meta_title, meta_description, og_image)
      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
      returning ${LIST_COLUMNS}`,
@@ -188,7 +208,9 @@ export async function createPost(values) {
       values.title,
       values.summary ?? null,
       values.content,
-      values.theme ?? null,
+      // Le driver traduit un tableau JS en tableau Postgres : pas de conversion
+      // manuelle, et une liste vide reste `{}` et non `null`.
+      normalizeThemes(values.theme_slugs),
       values.status ?? 'draft',
       readingMinutes,
       values.meta_title ?? null,

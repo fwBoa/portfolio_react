@@ -1,5 +1,6 @@
 import Layout from '../components/layout/Layout';
 import ShareNote from '../components/blog/ShareNote';
+import { themeLabels } from '../lib/themes';
 
 /**
  * Rendu d'une note.
@@ -58,9 +59,9 @@ const Article = ({ post, neighbours }) => {
               >
                 {fmtDate(post.published_at)}
               </time>
-              {post.theme && (
+              {post.theme_slugs?.length > 0 && (
                 <span className="text-[11px] uppercase tracking-[0.15em] text-os-body font-medium">
-                  {post.theme}
+                  {themeLabels(post.theme_slugs).join(' · ')}
                 </span>
               )}
               {post.reading_minutes && (

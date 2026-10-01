@@ -13,9 +13,10 @@
  *
  *   node --env-file=.env.local scripts/db-test.mjs
  */
-import pg from 'pg';
+import { Client } from '@neondatabase/serverless';
 
 // DDL et vérification d'intégrité : connexion directe plutôt que le pooler.
+// Driver Neon en WebSocket (443) — même raison que dans db-migrate.mjs.
 const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
 
 if (!url) {
@@ -23,7 +24,7 @@ if (!url) {
   process.exit(1);
 }
 
-const client = new pg.Client({
+const client = new Client({
   connectionString: url,
   ssl: { rejectUnauthorized: false },
 });

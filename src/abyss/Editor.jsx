@@ -29,9 +29,13 @@ import {
  *
  * Une note publiée ne peut pas redevenir brouillon (contrainte de la base) :
  * le bouton correspondant est donc absent, et le serveur refuse de toute façon.
+ *
+ * Les thèmes viennent de `src/lib/themes.js`, la même liste que celle utilisée
+ * par l'API pour valider — deux listes séparées auraient fini par diverger.
+ * Le choix est multiple : une note sur « LangChain chez un client » relève à la
+ * fois de l'IA et des Projets, et le singulier forçait à en sacrifier un.
  */
-
-const THEMES = ['IA', 'Dev', 'Projets', 'Constats', 'Veille'];
+import { THEMES, normalizeThemes } from '../lib/themes';
 
 const fmtDate = (value) =>
   value
@@ -49,7 +53,9 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
   const [slug, setSlug] = useState(post?.slug ?? '');
   const [slugTouched, setSlugTouched] = useState(Boolean(post?.slug));
   const [summary, setSummary] = useState(post?.summary ?? '');
-  const [theme, setTheme] = useState(post?.theme ?? '');
+  // Tableau de slugs. `normalizeThemes` tolère l'absence et l'ancienne forme
+  // (chaîne unique) : un brouillon créé avant la migration ne casse rien.
+  const [themeSlugs, setThemeSlugs] = useState(normalizeThemes(post?.theme_slugs));
   const [content, setContent] = useState(post?.content ?? '');
   const [metaTitle, setMetaTitle] = useState(post?.meta_title ?? '');
   const [metaDescription, setMetaDescription] = useState(post?.meta_description ?? '');
@@ -98,7 +104,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
       title,
       slug: effectiveSlug,
       summary,
-      theme: theme || null,
+      theme_slugs: themeSlugs,
       content,
       meta_title: metaTitle || null,
       meta_description: metaDescription || null,
@@ -131,7 +137,7 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
         title,
         slug: effectiveSlug,
         summary,
-        theme: theme || null,
+        theme_slugs: themeSlugs,
         content,
         meta_title: metaTitle || null,
         meta_description: metaDescription || null,
@@ -176,11 +182,11 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
   };
 
   const fieldClass =
-    'w-full px-4 py-2.5 bg-white border border-os-border rounded-lg text-os-text text-sm focus:border-os-text transition-colors duration-300 disabled:opacity-50';
+    'w-full px-4 py-2.5 bg-white border border-os-border rounded-lg text-os-text text-sm focus:border-os-text transition-colors duration-300 disabled:opacity-50 scroll-mt-24';
 
   return (
     <div className="min-h-screen bg-os-bg text-os-text">
-      {/* Barre d'action — reste visible en haut pendant l'édition */}
+      {/* Barre d'action — reste visible en haut pendant l'édition. */}
       <header className="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-os-border">
         <div className="max-w-[1600px] mx-auto px-5 sm:px-8 py-3 flex flex-wrap items-center gap-3">
           <button
@@ -274,22 +280,60 @@ const Editor = ({ post, onSaved, onCancel, onDeleted }) => {
             </div>
 
             <div>
-              <label htmlFor="f-theme" className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
-                Thème
-              </label>
-              <select
-                id="f-theme"
-                value={theme}
-                onChange={(event) => setTheme(event.target.value)}
-                className={fieldClass}
-              >
-                <option value="">Aucun</option>
-                {THEMES.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
+              {/* Choix multiple : le formulaire reste valide sans thème, un
+                  thème est une aide au classement, pas une obligation. */}
+              <fieldset className="scroll-mt-24">
+                <legend className="block text-[11px] uppercase tracking-[0.15em] font-medium text-os-body mb-2">
+                  Thèmes
+                </legend>
+                <div className="flex flex-wrap gap-2">
+                  {/* La case est masquée (`.sr-only`) pour que le libellé fasse
+                      office de bouton. Conséquence : le contour de focus
+                      global, porté par l'input, tombe sur un carré de 1px
+                      clippé — donc invisible. `focus-within` reporte le
+                      contour sur le libellé, seul élément réellement affiché. */}
+                  {THEMES.map((item) => {
+                    const checked = themeSlugs.includes(item.slug);
+                    return (
+                      <label
+                        key={item.slug}
+                        className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border text-[11px] uppercase tracking-[0.15em] font-medium cursor-pointer transition-colors duration-300 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-os-text ${
+                          checked
+                            ? 'border-os-text bg-os-surface text-os-text'
+                            : 'border-os-border text-os-body hover:border-os-text hover:text-os-text'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() =>
+                            setThemeSlugs((prev) =>
+                              prev.includes(item.slug)
+                                ? prev.filter((slug) => slug !== item.slug)
+                                : // L'ordre suit toujours celui de la liste :
+                                  // l'affichage reste donc stable d'une note à
+                                  // l'autre, quel que soit l'ordre des clics.
+                                  THEMES.map((t) => t.slug).filter(
+                                    (slug) => slug === item.slug || prev.includes(slug)
+                                  )
+                            )
+                          }
+                          className="sr-only"
+                        />
+                        {checked && (
+                          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M20 6 9 17l-5-5" />
+                          </svg>
+                        )}
+                        {item.label}
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="mt-2 text-[11px] text-os-body">
+                  Plusieurs choix possibles. Facultatif.
+                </p>
+              </fieldset>
             </div>
           </div>
 

@@ -75,6 +75,50 @@ const renderMarkdown = (markdown) => {
   });
 };
 
+/**
+ * Résume une erreur de connexion en une ligne exploitable.
+ *
+ * Pourquoi ce n'est pas juste `error.message` : le 01/10/2026, le build
+ * affichait « base injoignable () », sans aucune cause. Le diagnostic se
+ * perdait exactement au moment où il servait le plus.
+ *
+ * Le driver WebSocket de Neon lève un `ErrorEvent` — ce n'est pas une Error,
+ * et il n'a **aucun message**, même en descendant dans sa propriété `.error`
+ * (vérifié : l'erreur imbriquée est un TypeError vide, lui aussi). Il n'y a
+ * donc rien à afficher tel quel.
+ *
+ * On parcourt ce qui existe, puis on décrit la NATURE de l'échec : dire
+ * « panne de transport » vaut mieux qu'un vide, parce que cela indique
+ * immédiatement où chercher — le réseau, pas la requête ni le schéma.
+ *
+ * `AggregateError` (forme utilisée par `pg`, avec ses trois adresses Neon) est
+ * traité aussi : son détail est dans `.errors`, pas dans `.message`.
+ */
+const describeError = (error, depth = 0) => {
+  if (!error || depth > 3) return null;
+
+  const message = String(error.message ?? '').split('\n')[0].trim();
+  if (message) return message;
+
+  const codes = [...new Set((error.errors ?? []).map((e) => e?.code).filter(Boolean))];
+  if (codes.length > 0) return codes.join(', ');
+
+  if (error.code) return error.code;
+
+  // ErrorEvent : la cause réelle est imbriquée.
+  if (error.error) {
+    const nested = describeError(error.error, depth + 1);
+    if (nested) return nested;
+  }
+
+  // Dernier recours, et il est utile : nommer le type d'échec.
+  const nature = error.constructor?.name;
+  if (nature === 'ErrorEvent') return 'panne de transport (WebSocket)';
+  if (nature && nature !== 'Object') return `erreur sans message (${nature})`;
+
+  return null;
+};
+
 const resolveRoutes = async () => {
   try {
     const posts = await listPublished();
@@ -82,7 +126,7 @@ const resolveRoutes = async () => {
     log(`${posts.length} article(s) publié(s) lu(s) depuis la base.`);
     return { routes, posts };
   } catch (error) {
-    const reason = error.message.split('\n')[0];
+    const reason = describeError(error);
 
     // En intégration continue, une base injoignable fait échouer le build.
     //

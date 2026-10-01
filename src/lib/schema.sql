@@ -22,7 +22,7 @@ create table if not exists posts (
   title               text        not null,
   summary             text,
   content             text        not null,          -- markdown
-  theme               text,                          -- IA, Dev, Projets, Constats, Veille
+  theme_slugs         text[]      not null default '{}',  -- slugs de src/lib/themes.js
 
   -- Cycle de vie
   status              text        not null default 'draft',
@@ -48,16 +48,92 @@ create table if not exists posts (
   )
 );
 
+-- ============================================================================
+-- MIGRATION 01/10/2026 — le thème passe au pluriel (1/2) : la colonne
+-- ============================================================================
+--
+-- `theme text` devient `theme_slugs text[]`. Une note peut désormais relever de
+-- plusieurs thèmes : une note sur « LangChain chez un client » est à la fois IA
+-- et Projets, et le singulier forçait à en sacrifier un.
+--
+-- ATTENTION : `create table if not exists` ne modifie PAS une table existante.
+-- Sur une base déjà en service, la colonne doit donc être ajoutée
+-- explicitement, et AVANT l'index GIN ci-dessous qui la référence. Vérifié en
+-- test : dans l'autre ordre, la migration échoue sur « column theme_slugs does
+-- not exist ».
+--
+-- Sur une base neuve, la colonne est déjà déclarée dans le `create table` :
+-- l'instruction est alors sans effet.
+alter table posts
+  add column if not exists theme_slugs text[] not null default '{}';
+
 -- La liste du blog trie par date de publication décroissante et filtre sur le
 -- statut : index partiel, plus compact qu'un index complet.
 create index if not exists posts_publies_idx
   on posts (published_at desc)
   where status = 'published';
 
--- Filtrage par thème, une fois la liste allongée.
-create index if not exists posts_theme_idx
-  on posts (theme)
+-- Filtrage par thème.
+--
+-- GIN et non B-tree : un tableau ne se cherche pas avec un index B-tree. C'est
+-- l'opérateur de contenance (`theme_slugs @> array['ia']`) qui est indexé —
+-- celui dont se servira la future page /blog/theme/ia.
+create index if not exists posts_theme_slugs_idx
+  on posts using gin (theme_slugs)
   where status = 'published';
+
+-- ============================================================================
+-- MIGRATION 01/10/2026 — le thème passe au pluriel (2/2) : les données
+-- ============================================================================
+--
+-- S'exécute APRÈS la création de l'index, donc celui-ci se construit sur une
+-- colonne déjà remplie — inutile de le reconstruire ensuite.
+--
+-- `theme` n'est jamais supprimée en aveugle : le retrait n'a lieu que si le
+-- transfert s'est déroulé. Une erreur inattendue laisse l'ancienne colonne en
+-- place, avec ses données.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_name = 'posts' and column_name = 'theme'
+  ) then
+
+    -- `lower(trim(...))` fait à lui seul la traduction : l'ancienne colonne
+    -- contenait ce qui était AFFICHÉ (« IA », « Dev »), la nouvelle contient ce
+    -- qui identifie (« ia », « dev »). Inutile d'énumérer les cinq cas.
+    update posts
+    set theme_slugs = array[lower(trim(theme))]
+    where theme is not null and trim(theme) <> '';
+
+    -- Signaler toute valeur non traduite : mieux vaut une note sans thème
+    -- qu'un slug inventé, qui créerait une catégorie fantôme — invisible et
+    -- impossible à filtrer.
+    --
+    -- ATTENTION : cette liste est HISTORIQUE. Elle décrit les thèmes qui
+    -- existaient le 01/10/2026, date de la migration, et ne doit PAS être
+    -- tenue à jour : elle sert à traduire une valeur déjà écrite, pas à
+    -- autoriser les thèmes courants. La liste de référence est
+    -- `src/lib/themes.js`, et la table ne porte aucune contrainte sur
+    -- `theme_slugs` — vérifié. Un thème ajouté après cette date est donc
+    -- accepté sans migration.
+    if exists (
+      select 1 from posts
+      where array_length(theme_slugs, 1) is not null
+        and not (theme_slugs <@ array['ia', 'dev', 'projets', 'constats', 'veille'])
+    ) then
+      raise warning 'Migration : thèmes non reconnus ignorés — voir la colonne theme.';
+      update posts set theme_slugs = '{}'
+      where not (theme_slugs <@ array['ia', 'dev', 'projets', 'constats', 'veille']);
+    end if;
+
+    drop index if exists posts_theme_idx;
+    alter table posts drop column theme;
+
+  end if;
+end $$;
+
+-- ============================================================================
 
 -- updated_at tenu à jour par la base, jamais par le code appelant : une
 -- écriture oubliée ne peut pas laisser une date périmée.
