@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import Layout from '../components/layout/Layout';
 import ToggleFace from '../components/ToggleFace';
 import Face from '../components/Face';
@@ -70,11 +69,9 @@ const Home = () => {
 
   return (
     <Layout isDevMode={isDevMode} toggleMode={toggleMode} activeSection={activeSection}>
-      <AnimatePresence mode="wait">
-        <ToggleFace isDevMode={isDevMode}>
-          {isDevMode ? <DevFace /> : <Face />}
-        </ToggleFace>
-      </AnimatePresence>
+      <ToggleFace isDevMode={isDevMode}>
+        {isDevMode ? <DevFace /> : <Face />}
+      </ToggleFace>
     </Layout>
   );
 };

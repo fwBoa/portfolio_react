@@ -33,7 +33,7 @@ const letterVariants = {
   }),
 };
 
-const AnimatedLetters = ({ text, className, delayOffset = 0 }) => (
+const AnimatedLetters = ({ text, className = '', delayOffset = 0 }) => (
   <span className={`${className} inline-block overflow-hidden`}>
     {text.split('').map((char, i) => (
       <motion.span
