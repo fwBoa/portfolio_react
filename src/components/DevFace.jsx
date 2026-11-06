@@ -33,7 +33,11 @@ const DevFace = () => {
   return (
     /* Le mode Dev n'avait aucun landmark principal : le contenu n'était
        annoncé nulle part. C'est aussi la cible du lien d'évitement. */
-    <main id="main" className="min-h-screen bg-dev-bg text-dev-green font-mono pt-20 overflow-x-hidden">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="min-h-screen bg-dev-bg text-dev-green font-mono pt-20 overflow-x-hidden focus:outline-none"
+    >
       <div className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 py-12 sm:py-16 lg:py-20">
         {/* Masthead */}
         <motion.div
@@ -42,9 +46,14 @@ const DevFace = () => {
           transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
           className="mb-10 sm:mb-14 lg:mb-20"
         >
-          <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display">
+          <span className="text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display">
             Web Developer · AI Automation · Agentic Engineer
           </span>
+          <div className="mt-4 flex items-center gap-2 font-mono text-[11px] text-dev-muted sm:hidden">
+            <span className="text-dev-green">jean-david@portfolio</span>
+            <span aria-hidden="true">·</span>
+            <span>Prometheus OS v2.0</span>
+          </div>
         </motion.div>
 
         {/* ASCII Banner — responsive */}
@@ -52,9 +61,9 @@ const DevFace = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="mb-10 sm:mb-14 lg:mb-20"
+          className="mb-10 hidden sm:mb-14 sm:block lg:mb-20"
         >
-          <pre className="text-[0.4rem] sm:text-[0.5rem] md:text-xs lg:text-sm text-dev-green leading-[1.1] select-none overflow-x-auto whitespace-pre"
+          <pre className="text-[0.5rem] md:text-xs lg:text-sm text-dev-green leading-[1.1] select-none overflow-x-auto whitespace-pre"
           >
 {`
      ██╗███████╗ █████╗ ███╗   ██╗      ██████╗  █████╗ ██╗   ██╗██╗██████╗
@@ -75,19 +84,19 @@ const DevFace = () => {
           className="grid grid-cols-1 lg:grid-cols-[280px_1fr] xl:grid-cols-[320px_1fr] gap-10 sm:gap-12 lg:gap-16"
         >
           {/* Left column — System info */}
-          <div className="space-y-10 sm:space-y-14">
+          <div className="order-2 space-y-10 sm:space-y-14 lg:order-none">
             {/* Stats */}
             <motion.div variants={itemVariants}>
-              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
+              <span className="text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
                 System Info
               </span>
               <div className="space-y-3">
                 {stats.map((stat) => (
                   <div key={stat.label} className="flex justify-between items-baseline">
-                    <span className="text-[10px] sm:text-xs text-dev-muted uppercase tracking-wider">
+                    <span className="text-[11px] text-dev-muted uppercase tracking-wider sm:text-xs">
                       {stat.label}
                     </span>
-                    <span className="text-xs sm:text-sm text-dev-text font-medium">
+                    <span className="text-[13px] text-dev-text font-medium sm:text-sm">
                       {stat.value}
                     </span>
                   </div>
@@ -97,17 +106,17 @@ const DevFace = () => {
 
             {/* Skill groups */}
             <motion.div variants={itemVariants}>
-              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
+              <span className="text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
                 Capabilities
               </span>
               {skillGroups.map((group) => (
                 <div key={group.title} className="mb-5 sm:mb-6">
-                  <span className="text-[10px] sm:text-xs text-dev-green uppercase tracking-wider block mb-2">
+                  <span className="text-[11px] text-dev-green uppercase tracking-wider block mb-2 sm:text-xs">
                     {group.devTitle}
                   </span>
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
                     {group.items.map((item) => (
-                      <span key={item} className="text-[10px] sm:text-xs text-dev-muted">
+                      <span key={item} className="text-[11px] text-dev-muted sm:text-xs">
                         {item}
                       </span>
                     ))}
@@ -118,17 +127,17 @@ const DevFace = () => {
 
             {/* Contact links */}
             <motion.div variants={itemVariants}>
-              <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
+              <span className="text-[10px] tracking-[0.3em] uppercase text-dev-muted font-medium font-display block mb-4 sm:mb-6">
                 Contact
               </span>
               <div className="space-y-2">
-                <a href={`mailto:${site.email}`} className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                <a href={`mailto:${site.email}`} className="block text-[13px] text-dev-text transition-colors duration-300 hover:text-dev-green sm:text-sm">
                   {site.email}
                 </a>
-                <a href={site.github} target="_blank" rel="noopener noreferrer" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                <a href={site.github} target="_blank" rel="noopener noreferrer" className="block text-[13px] text-dev-text transition-colors duration-300 hover:text-dev-green sm:text-sm">
                   {site.githubLabel}
                 </a>
-                <a href={site.linkedin} target="_blank" rel="noopener noreferrer" className="block text-xs sm:text-sm text-dev-text hover:text-dev-green transition-colors duration-300">
+                <a href={site.linkedin} target="_blank" rel="noopener noreferrer" className="block text-[13px] text-dev-text transition-colors duration-300 hover:text-dev-green sm:text-sm">
                   {site.linkedinLabel}
                 </a>
               </div>
@@ -136,7 +145,7 @@ const DevFace = () => {
           </div>
 
           {/* Right column — Terminal */}
-          <div>
+          <div className="order-1 lg:order-none">
             <Terminal />
           </div>
         </motion.div>

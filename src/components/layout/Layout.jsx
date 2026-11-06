@@ -1,5 +1,8 @@
+import { FaCode } from 'react-icons/fa';
 import SiteHeader from './SiteHeader';
+import SiteHeaderFusion from './SiteHeaderFusion';
 import SiteFooter from './SiteFooter';
+import SmoothScroll from './SmoothScroll';
 
 /**
  * Ossature commune à toutes les pages.
@@ -25,7 +28,13 @@ import SiteFooter from './SiteFooter';
  * chaque chargement avant d'atteindre le contenu — sur chaque page. Il est
  * masqué visuellement jusqu'à ce qu'il reçoive le focus.
  */
-const Layout = ({ children, isDevMode = false, toggleMode, activeSection = null }) => (
+const Layout = ({
+  children,
+  isDevMode = false,
+  toggleMode,
+  activeSection = null,
+  notesHref = '/#notes',
+}) => (
   <div
     data-dev={isDevMode}
     className={`min-h-screen flex flex-col ${
@@ -35,14 +44,36 @@ const Layout = ({ children, isDevMode = false, toggleMode, activeSection = null 
     <a href="#main" className="skip-link">
       Aller au contenu
     </a>
-    <SiteHeader
-      isDevMode={isDevMode}
-      toggleMode={toggleMode}
-      activeSection={activeSection}
-    />
+    {!isDevMode && <SmoothScroll />}
+    {isDevMode ? (
+      <SiteHeader toggleMode={toggleMode} />
+    ) : (
+      <SiteHeaderFusion activeSection={activeSection} notesHref={notesHref} />
+    )}
     {children}
     <SiteFooter isDevMode={isDevMode} />
+    {!isDevMode && toggleMode && <DevSwitch toggleMode={toggleMode} />}
   </div>
 );
+
+/**
+ * Entrée du mode Dev, séparée de la navigation. C'est le seul contrôle qui
+ * ouvre le terminal : le tiroir et la capsule n'en portent pas la commande.
+ */
+function DevSwitch({ toggleMode }) {
+  return (
+    <button
+      type="button"
+      onClick={toggleMode}
+      aria-label="Switch, passer en mode Dev"
+      title="Passer en mode Dev"
+      className="dev-switch fixed bottom-6 right-6 z-[9995] inline-flex min-h-11 items-center gap-2 rounded-full border border-os-border bg-white px-4 text-xs font-medium text-os-reading shadow-[0_20px_50px_-30px_rgba(45,107,107,0.6)] transition-[color,background-color,border-color,transform] duration-300 hover:border-os-text hover:text-os-text active:scale-95"
+    >
+      <FaCode size={11} aria-hidden="true" />
+      {/* Icône seule sur mobile : moins d'occlusion sur les cartes. */}
+      <span className="hidden sm:inline">Switch</span>
+    </button>
+  );
+}
 
 export default Layout;

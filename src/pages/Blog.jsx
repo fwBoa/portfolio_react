@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import Layout from '../components/layout/Layout';
 import BlogList from '../components/blog/BlogList';
 
@@ -14,26 +13,12 @@ import BlogList from '../components/blog/BlogList';
  * porté par le logo de l'en-tête et par l'entrée « À propos » de la nav.
  */
 
-const reveal = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
-
 const Blog = ({ posts }) => (
-  <Layout activeSection="notes">
+  <Layout activeSection="notes" notesHref="/blog">
     <main id="main" className="flex-1 bg-os-bg text-os-text pt-20 overflow-x-hidden">
       <div className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 py-16 sm:py-24">
       {/* En-tête du blog */}
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={reveal}
-        className="mb-16 sm:mb-20 lg:mb-24"
-      >
+      <div className="note-enter mb-16 sm:mb-20 lg:mb-24">
         <span className="text-[9px] sm:text-[10px] tracking-[0.3em] uppercase text-os-body font-medium font-display block mb-6">
           Notes de veille
         </span>
@@ -45,7 +30,7 @@ const Blog = ({ posts }) => (
           développement web, et les constats tirés de projets réels.
           Une note à la fois, quand le sujet mérite d&apos;être écrit.
         </p>
-      </motion.div>
+      </div>
 
       {/* Liste des notes */}
       {posts.length === 0 ? (

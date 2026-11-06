@@ -39,7 +39,9 @@ const App = ({ ssrPath, data = null }) => (
   <MotionConfig reducedMotion="user">
     <Router ssrPath={ssrPath}>
       <Switch>
-        <Route path="/" component={Home} />
+        <Route path="/">
+          <Home posts={data?.posts ?? []} />
+        </Route>
         <Route path="/blog">
           <Blog posts={data?.posts ?? []} />
         </Route>

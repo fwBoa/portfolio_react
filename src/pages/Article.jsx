@@ -34,7 +34,7 @@ const Article = ({ post, neighbours }) => {
   const next = neighbours?.next ?? null;
 
   return (
-    <Layout activeSection="notes">
+    <Layout activeSection="notes" notesHref="/blog">
       <main id="main" className="flex-1 bg-os-bg text-os-text pt-20 overflow-x-hidden">
         <article className="max-w-[1400px] mx-auto px-5 sm:px-10 lg:px-20 xl:px-24 py-16 sm:py-24">
         {/* 1. Barre de retour */}

@@ -1,10 +1,34 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'node:path'
+import { existsSync } from 'node:fs'
 import react from '@vitejs/plugin-react'
+
+/**
+ * `vite preview` sert l'index racine pour `/blog` (sans slash), alors que le
+ * fichier pré-rendu est `blog/index.html`. React hydrate alors Blog sur le HTML
+ * de l'accueil et lève un avertissement d'hydratation. Vercel gère déjà les
+ * URLs propres ; ce middleware rétablit le même comportement en local.
+ */
+const cleanPreviewUrls = () => ({
+  name: 'clean-preview-urls',
+  configurePreviewServer(server) {
+    const dist = resolve(server.config.root, server.config.build.outDir)
+    server.middlewares.use((req, _res, next) => {
+      const [pathname, query = ''] = req.url.split('?')
+      if (
+        !pathname.endsWith('/') &&
+        existsSync(resolve(dist, pathname.slice(1), 'index.html'))
+      ) {
+        req.url = `${pathname}/${query ? `?${query}` : ''}`
+      }
+      next()
+    })
+  },
+})
 
 // https://vite.dev/config/
 export default defineConfig(({ isSsrBuild }) => ({
-  plugins: [react()],
+  plugins: [react(), cleanPreviewUrls()],
   build: {
     rollupOptions: {
       // Deux pages distinctes, deux points d'entrée.

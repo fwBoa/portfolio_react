@@ -39,6 +39,7 @@ const log = (msg) => console.log(`[prerender] ${msg}`);
  * retombe sur les routes statiques et le site reste déployable.
  */
 import { listPublished, getPublishedBySlug, getNeighbours } from '../src/lib/posts.js';
+import { themeLabels } from '../src/lib/themes.js';
 import { JSDOM } from 'jsdom';
 import createDOMPurify from 'dompurify';
 import { marked } from 'marked';
@@ -213,6 +214,37 @@ const applyMeta = (html, meta) => {
       );
     }
   }
+  // Type Open Graph et métadonnées d'article.
+  //
+  // Le gabarit déclare `og:type=website`, ce qui est vrai pour l'accueil et la
+  // liste du blog, mais faux pour une note : les plateformes de partage
+  // n'affichent alors ni la date ni la section, et les moteurs perdent le
+  // signal de fraîcheur. Les propriétés `article:*` n'ont de sens qu'avec
+  // `og:type=article` — les deux vont donc ensemble.
+  if (meta.type) {
+    out = out.replace(
+      /<meta property="og:type" content="[^"]*"/,
+      () => `<meta property="og:type" content="${escapeAttr(meta.type)}"`
+    );
+  }
+  if (meta.article) {
+    const lines = [
+      ['article:published_time', meta.article.publishedTime],
+      ['article:modified_time', meta.article.modifiedTime],
+      ['article:section', meta.article.section],
+      ['article:author', meta.article.author],
+    ]
+      .filter(([, value]) => value)
+      .map(
+        ([property, value]) =>
+          `\n    <meta property="${property}" content="${escapeAttr(value)}" />`
+      )
+      .join('');
+    out = out.replace(
+      /<meta property="og:type" content="[^"]*"\s*\/?>/,
+      (match) => match + lines
+    );
+  }
   return out;
 };
 
@@ -222,6 +254,17 @@ const applyMeta = (html, meta) => {
  * avec le titre de l'article en repli.
  */
 const siteName = 'Jean-David Zamblezie';
+
+/** Date ISO 8601 pour Open Graph, ou rien si la valeur est absente/invalide. */
+const isoDate = (value) => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date.toISOString();
+};
+
+/** Section d'un article : ses thèmes, en libellés lisibles. */
+const sectionFor = (post) => themeLabels(post.theme_slugs).join(', ') || undefined;
+
 const metaFor = (route, postByRoute) => {
   if (route === '/blog') {
     return {
@@ -246,6 +289,14 @@ const metaFor = (route, postByRoute) => {
       description: post.meta_description || post.summary || '',
       canonical: `https://zamblezie.fr${route}`,
       ogImage: post.og_image,
+      type: 'article',
+      article: {
+        publishedTime: isoDate(post.published_at),
+        modifiedTime: isoDate(post.updated_at || post.published_at),
+        section: sectionFor(post),
+        // Le profil de l'auteur : la page d'accueil, qui le décrit.
+        author: `${SITE_URL}/`,
+      },
     };
   }
   return null;
@@ -306,7 +357,7 @@ const jsonLdFor = (route, postByRoute, posts) => {
       url: `${SITE_URL}${route}`,
       headline: post.title,
       description: post.meta_description || post.summary || undefined,
-      articleSection: post.theme || undefined,
+      articleSection: sectionFor(post),
       datePublished: post.published_at,
       dateModified: post.updated_at || post.published_at,
       inLanguage: 'fr-FR',
@@ -397,6 +448,10 @@ try {
   // Le markdown brut est exclu de la sérialisation : seul le HTML assaini
   // voyage dans la page, le contenu source ne sert qu'au rendu initial.
   const dataFor = (route) => {
+    // L'accueil n'affiche que les trois dernières notes ; la page /blog garde
+    // la liste complète. On évite ainsi d'embarquer l'archive dans le HTML de
+    // la page d'accueil.
+    if (route === '/') return { posts: posts.slice(0, 3) };
     if (route === '/blog') return { posts };
     if (route.startsWith('/blog/')) {
       const stored = postByRoute.get(route.slice('/blog/'.length));

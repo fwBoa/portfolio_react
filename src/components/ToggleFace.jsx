@@ -1,28 +1,24 @@
 import { motion, AnimatePresence } from 'framer-motion';
 
 /**
- * ToggleFace — bascule animée entre la face normale et la face dev.
+ * ToggleFace — fondu court entre la face publique et le terminal.
  *
- * `initial={false}` sur l'AnimatePresence : pas de flip au premier chargement
- * (sur mobile, la rotation rejouée pendant l'hydratation écrasait toute la
- * page). Les bascules suivantes, elles, sont animées. `transformPerspective`
- * est indispensable, sinon un rotateY se réduit à un écrasement à plat.
- * L'AnimatePresence enveloppe l'élément keyé lui-même, sinon le `exit` ne
- * part jamais.
+ * `initial={false}` sur l'AnimatePresence : pas de fondu au premier
+ * chargement, seulement lors des bascules. Le léger glissement vertical est
+ * désactivé par `MotionConfig reducedMotion="user"` quand le système demande
+ * moins de mouvement ; l'opacité, elle, reste.
+ *
+ * Aucune transformation permanente sur le conteneur : le `position: sticky`
+ * des cartes de compétences n'a pas de containing block parasite.
  */
 const ToggleFace = ({ isDevMode, children }) => (
   <AnimatePresence mode="wait" initial={false}>
-    {/* ponytail: transform permanent → .grain-overlay (position: fixed) suit la page. */}
     <motion.div
       key={isDevMode ? 'dev' : 'normal'}
-      initial={{ rotateY: 90, opacity: 0 }}
-      animate={{ rotateY: 0, opacity: 1 }}
-      exit={{ rotateY: -90, opacity: 0 }}
-      transition={{
-        duration: 0.7,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
-      style={{ transformPerspective: 1200 }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
       className="w-full"
     >
       {children}

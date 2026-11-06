@@ -88,7 +88,7 @@ export async function getPublishedBySlug(slug) {
   if (!pooled || !slug) return null;
   const { rows } = await getPool().query(
     `select slug, title, summary, content, theme_slugs, note_number, reading_minutes,
-            published_at, meta_title, meta_description, og_image
+            published_at, updated_at, meta_title, meta_description, og_image
      from posts
      where slug = $1 and status = 'published'`,
     [slug]

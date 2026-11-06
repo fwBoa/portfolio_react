@@ -25,7 +25,9 @@ export default {
         'dev-surface': '#111111',
         'dev-border': '#222222',
         'dev-text': '#e5e5e5',
-        'dev-muted': '#666666',
+        // 5,7:1 sur le fond terminal (#0a0a0a) — l'ancien #666 tombait à 3,6:1
+        // pour les libellés de 9–10 px.
+        'dev-muted': '#8a8a8a',
         'dev-green': '#00ff41',
       },
       fontFamily: {

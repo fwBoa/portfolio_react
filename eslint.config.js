@@ -6,7 +6,11 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // `mockups/` contient les maquettes autonomes de navigation et de
+  // compétences. Elles ne font pas partie du bundle React et ne suivent donc
+  // pas les règles du site. Les ignorer évite de faire échouer la CI sur des
+  // pages de démonstration.
+  globalIgnores(['dist', 'mockups']),
   {
     // Code exécuté côté Node : scripts du build, fonctions serveur, couche
     // d'accès aux données importée par les deux mondes. Ces fichiers ont

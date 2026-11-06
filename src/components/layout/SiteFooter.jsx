@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaTimes } from 'react-icons/fa';
 import useFocusTrap from '../../hooks/useFocusTrap';
+import { startLenis, stopLenis } from '../../lib/smooth-scroll';
 import { site, LEGAL_LAST_UPDATED } from '../../data/site';
 import { legalSections, privacySections } from '../../data/legal';
 
@@ -46,10 +47,12 @@ const SiteFooter = ({ isDevMode = false }) => {
     window.addEventListener('keydown', onKeyDown);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    stopLenis();
 
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = previousOverflow;
+      startLenis();
     };
   }, [isOpen]);
 

@@ -88,7 +88,7 @@ const content = `# ${site.name} — ${site.jobTitle}
 > Portfolio de ${site.name}, développeur web basé à ${site.location}, spécialisé
 > en automatisation IA et ingénierie agentique. Conçoit des sites et applications
 > web sur mesure (React, Next.js, TypeScript) ainsi que des systèmes agentiques
-> (LangChain, MCP, n8n).
+> (LangChain, Claude Code, Codex, Antigravity, MCP, n8n).
 
 Source : ${site.url}/ — Contact : ${site.email}
 

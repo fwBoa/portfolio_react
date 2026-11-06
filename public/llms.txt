@@ -1,6 +1,6 @@
 # Jean-David Zamblezie — Portfolio
 
-> Développeur web full stack basé à Paris, spécialisé en automatisation IA et ingénierie agentique. Conçoit des sites et applications web sur mesure (React, Next.js, TypeScript) ainsi que des systèmes agentiques (LangChain, MCP, n8n).
+> Développeur web full stack basé à Paris, spécialisé en automatisation IA et ingénierie agentique. Conçoit des sites et applications web sur mesure (React, Next.js, TypeScript) ainsi que des systèmes agentiques (LangChain, Claude Code, Codex, Antigravity, MCP, n8n).
 
 Portfolio personnel de Jean-David Zamblezie. Le site présente trois domaines
 d'expertise : développement web, IA et automatisation, infrastructure et design.
@@ -10,7 +10,7 @@ Contact : jeandavidzamblezie@outlook.fr
 
 ## Pages
 
-- [Accueil](https://zamblezie.fr/): page unique présentant le profil, les compétences et les coordonnées
+- [Accueil](https://zamblezie.fr/): profil, compétences, notes récentes et coordonnées
 - [Notes](https://zamblezie.fr/blog): notes de veille sur l'automatisation IA, le développement web et les constats tirés de projets réels
 
 ## Notes récentes
@@ -37,12 +37,13 @@ outil métier, plateforme interactive. De la structure à l'interface, avec une
 attention portée à la fluidité, à l'accessibilité et à la fiabilité.
 
 ### 02 — IA & Automatisation
-Python, LangChain, OpenAI API, n8n, MCP, Agentic Workflows
+Python, LangChain, OpenAI API, Claude Code, Codex, Antigravity, n8n, MCP, Agentic Workflows
 
 Systèmes agentiques capables d'autonomiser des tâches complexes grâce aux
 modèles de langage. Orchestration avec LangChain, connexion des agents aux
 outils et données via MCP (Model Context Protocol), pipelines RAG, workflows
-n8n et architectures multi-agents collaboratifs.
+n8n et architectures multi-agents collaboratifs. Agents de code utilisés au
+quotidien : Claude Code, Codex et Antigravity.
 
 ### 03 — Infrastructure & Design
 Git, Docker, Figma, PostgreSQL, Supabase, Vercel

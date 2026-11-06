@@ -1,67 +1,61 @@
+import { useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaDownload } from 'react-icons/fa';
 import avatar from '../assets/Img/avatarportfoliobackgroundremove.png';
 import avatarWebp from '../assets/Img/avatar.webp';
 import cv from '../assets/doc/cv_alternance_2026.pdf';
 import { site } from '../data/site';
-import { skillGroups as skills } from '../data/skills';
-import SkillStack from './SkillStack';
-
-const revealUp = {
-  hidden: { opacity: 0, y: 60 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.9, delay: i * 0.12, ease: [0.25, 0.1, 0.25, 1] },
-  }),
-};
-
-const lineReveal = {
-  hidden: { scaleX: 0 },
-  visible: {
-    scaleX: 1,
-    transition: { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] },
-  },
-};
-
-const letterVariants = {
-  hidden: { y: '110%', opacity: 0 },
-  visible: (i) => ({
-    y: '0%',
-    opacity: 1,
-    transition: { duration: 0.7, delay: i * 0.03, ease: [0.25, 0.1, 0.25, 1] },
-  }),
-};
+import SkillsSection from './SkillsSection';
+import NotesSection from './NotesSection';
 
 const AnimatedLetters = ({ text, className = '', delayOffset = 0 }) => (
   <span className={`${className} inline-block overflow-hidden`}>
     {text.split('').map((char, i) => (
-      <motion.span
+      <span
         key={`${char}-${i}`}
-        custom={i + delayOffset}
-        initial="hidden"
-        animate="visible"
-        variants={letterVariants}
-        className="inline-block"
-        style={{ whiteSpace: char === ' ' ? 'pre' : undefined }}
+        className="hero-letter inline-block"
+        style={{
+          animationDelay: `${(i + delayOffset) * 0.03}s`,
+          whiteSpace: char === ' ' ? 'pre' : undefined,
+        }}
       >
         {char === ' ' ? ' ' : char}
-      </motion.span>
+      </span>
     ))}
   </span>
 );
 
-const Face = () => {
+const Face = ({ posts = [] }) => {
   const { scrollY } = useScroll();
   const rawAvatarY = useTransform(scrollY, [0, 800], [0, -50]);
   const avatarY = useSpring(rawAvatarY, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
+  // L'entrée du hero est déclenchée après le montage : lancée au chargement
+  // de la feuille de style, elle était déjà finie quand l'écran s'affichait
+  // sur iPhone. Le HTML reste visible avant l'hydratation.
+  const [heroEnter, setHeroEnter] = useState(false);
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+    const frame = window.requestAnimationFrame(() => setHeroEnter(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
   return (
-    <main id="main" className="bg-os-bg text-os-text pt-20 overflow-x-hidden">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="bg-os-bg text-os-text pt-20 overflow-x-clip focus:outline-none"
+    >
       <div className="grain-overlay" />
 
       {/* ===== HERO ===== */}
-      <section id="about" className="relative px-5 sm:px-10 lg:px-20 xl:px-24 pt-12 sm:pt-20 lg:pt-24 pb-16 sm:pb-24 lg:pb-32">
+      <section
+        id="about"
+        className={`relative px-5 sm:px-10 lg:px-20 xl:px-24 pt-12 sm:pt-20 lg:pt-24 pb-16 sm:pb-24 lg:pb-32 ${
+          heroEnter ? 'hero-enter' : ''
+        }`}
+      >
         <div className="max-w-[1400px] mx-auto relative">
 
           {/* Name + Avatar — un seul h1, ses deux lignes sont des spans */}
@@ -77,27 +71,27 @@ const Face = () => {
                 </span>
 
                 <motion.span
-                  initial={{ opacity: 0, scale: 0.8, rotate: -3 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
                   style={{ y: avatarY }}
                   className="lg:absolute lg:bottom-[-1rem] lg:left-[-2%] xl:left-[0%] flex-shrink-0 self-center lg:self-auto mt-6 lg:mt-0 block"
                 >
-                  {/* Image décorative : le nom est déjà porté par le h1 */}
-                  <picture>
-                    <source srcSet={avatarWebp} type="image/webp" />
-                    <img
-                      src={avatar}
-                      alt=""
-                      aria-hidden="true"
-                      width="480"
-                      height="720"
-                      className="w-36 sm:w-44 md:w-52 lg:w-60 h-auto object-contain max-w-full"
-                      loading="eager"
-                      fetchPriority="high"
-                      decoding="async"
-                    />
-                  </picture>
+                  {/* Image décorative : le nom est déjà porté par le h1.
+                      Elle reste visible dès le premier rendu (LCP), puis un
+                      léger zoom CSS donne l'entrée sans la masquer. */}
+                  <span className="hero-avatar-enter block">
+                    <picture>
+                      <source srcSet={avatarWebp} type="image/webp" />
+                      <img
+                        src={avatar}
+                        alt=""
+                        aria-hidden="true"
+                        width="480"
+                        height="720"
+                        className="w-36 sm:w-44 md:w-52 lg:w-60 h-auto object-contain max-w-full"
+                        loading="eager"
+                        fetchPriority="high"
+                      />
+                    </picture>
+                  </span>
                 </motion.span>
 
                 {/* Complète le h1 pour les moteurs de recherche et les lecteurs d'écran */}
@@ -136,88 +130,10 @@ const Face = () => {
       </section>
 
       {/* ===== SKILLS ===== */}
-      <section id="skills" className="relative bg-os-surface/40">
-        {skills.map((cat, index) => (
-          <div
-            key={cat.num}
-            className="relative px-5 sm:px-10 lg:px-20 xl:px-24 py-20 sm:py-28 lg:py-40"
-          >
-            {/* Line separator */}
-            {index > 0 && (
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.5 }}
-                variants={lineReveal}
-                className="absolute top-0 left-5 sm:left-10 lg:left-20 xl:left-24 right-5 sm:right-10 lg:right-20 xl:right-24 h-px bg-os-border origin-left"
-              />
-            )}
+      <SkillsSection />
 
-            {/* Watermark number — masqué sous sm : sur mobile il passait derrière
-                le paragraphe et brouillait la lecture */}
-            <motion.span
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
-              className="hidden sm:block absolute top-1/2 sm:left-[70%] lg:left-[75%] -translate-x-1/2 -translate-y-1/2 text-[clamp(7rem,22vw,24rem)] font-display font-bold text-os-border/10 sm:text-os-border/20 select-none pointer-events-none leading-none"
-            >
-              {cat.num}
-            </motion.span>
-
-            <div className="max-w-[1400px] mx-auto relative z-10">
-              {/* Title + skill tags */}
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 sm:gap-10 lg:gap-20 items-start">
-                <motion.div
-                  custom={index}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.4 }}
-                  variants={revealUp}
-                >
-                  <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-display font-bold tracking-tight leading-[1.05]">
-                    {cat.title}
-                  </h2>
-                </motion.div>
-
-                <motion.div
-                  custom={index + 1}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.4 }}
-                  variants={revealUp}
-                  className="lg:pt-3"
-                >
-                  {/* Stack en pastilles : entrée en cascade + aura magnétique.
-                      Le détail de l'animation est dans components/SkillStack.jsx. */}
-                  <SkillStack items={cat.items} />
-                </motion.div>
-              </div>
-
-              {/* Description */}
-              <motion.p
-                custom={index + 2}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.4 }}
-                variants={revealUp}
-                className="mt-10 sm:mt-14 lg:mt-20 text-os-body text-sm sm:text-base lg:text-lg max-w-2xl leading-[1.8]"
-              >
-                {cat.desc}
-              </motion.p>
-            </div>
-          </div>
-        ))}
-      </section>
-
-      {/* Line before contact */}
-      <motion.div
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.5 }}
-        variants={lineReveal}
-        className="mx-5 sm:mx-10 lg:mx-20 xl:mx-24 h-px bg-os-border origin-left"
-      />
+      {/* ===== NOTES ===== */}
+      <NotesSection posts={posts} />
 
       {/* ===== CONTACT ===== */}
       <section id="contact" className="px-5 sm:px-10 lg:px-20 xl:px-24 py-24 sm:py-32 lg:py-48">

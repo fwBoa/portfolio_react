@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Polices auto-hébergées : supprime la feuille Google Fonts bloquante et la
+   requête tierce. Les noms de fichiers sont versionnés pour un cache long. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/inter-latin-v20.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Syne';
+  font-style: normal;
+  font-weight: 500 700;
+  font-display: swap;
+  src: url('/fonts/syne-latin-v24.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin-v24.woff2') format('woff2');
+}
+
 *, *::before, *::after {
   margin: 0;
   padding: 0;
@@ -25,8 +51,18 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: #ffffff;
   color: #000000;
+  /* `clip` plutôt que `hidden` : pas de conteneur de défilement créé, donc
+     `position: sticky` garde la fenêtre comme référence. `hidden` reste en
+     secours pour les Safari qui ignorent `clip`. */
   overflow-x: hidden;
+  overflow-x: clip;
   line-height: 1.6;
+}
+
+/* Même secours sur le conteneur principal, qui porte le sticky des cartes. */
+#main {
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 ::selection {
@@ -115,6 +151,14 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
+/* Un calque fixed plein écran avec un filtre SVG est coûteux sur iPhone et
+   provoque des artefacts pendant le défilement. Le grain reste sur bureau. */
+@media (max-width: 767px), (hover: none) {
+  .grain-overlay {
+    display: none;
+  }
+}
+
 /* ── Entrée en cascade des notes du blog ────────────────────────────────
    En CSS et non avec Framer Motion : le HTML est figé au build, et une
    animation pilotée par JavaScript laisse « opacity: 0 » dans le fichier.
@@ -144,6 +188,45 @@ body {
   .note-enter {
     animation: none;
   }
+}
+
+/* ── Entrée du hero ─────────────────────────────────────────────────────
+   En CSS et non avec Framer : le HTML est pré-rendu, et Framer ne rejoue pas
+   l'état initial à l'hydratation. Les lettres sont masquées puis remontent,
+   l'avatar reste visible (il est le LCP) et reçoit un léger zoom. */
+@keyframes hero-letter-enter {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* L'animation démarre après le montage React, sinon elle peut être terminée
+   avant que le premier écran soit visible sur iPhone. Le HTML statique reste
+   lisible sans JavaScript. */
+.hero-enter .hero-letter {
+  animation: hero-letter-enter 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) backwards;
+}
+
+@keyframes hero-avatar-enter {
+  from {
+    transform: scale(0.94);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.hero-avatar-enter {
+  transform-origin: center bottom;
+}
+
+.hero-enter .hero-avatar-enter {
+  animation: hero-avatar-enter 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) backwards;
 }
 
 /* Terminal cursor blink */
@@ -392,6 +475,352 @@ body {
   }
   html {
     scroll-behavior: auto;
+  }
+
+  .hero-letter,
+  .hero-avatar-enter {
+    animation: none;
+  }
+}
+
+/* Le verre de l'en-tête et du switch devient opaque si le système demande
+   moins de transparence. */
+@media (prefers-reduced-transparency: reduce) {
+  .fusion-capsule,
+  .dev-switch {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Sur iPhone, le verre de la capsule est déjà remplacé par un fond quasi
+   opaque (pas de backdrop-filter sous 1024 px). On garde le vrai verre sur
+   bureau, avec le préfixe WebKit. */
+@media (min-width: 1024px) {
+  .fusion-capsule {
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  }
+}
+
+/* Le tiroir est teal : le focus teal global y serait invisible. */
+#fusion-menu :focus-visible {
+  outline-color: #ffffff;
+}
+
+/* Le switch flottant et le bas du tiroir doivent rester au-dessus de la barre
+   d'accueil iOS. */
+.dev-switch {
+  bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+#fusion-menu {
+  padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (forced-colors: active) {
+  .fusion-capsule {
+    border-color: CanvasText;
+  }
+
+  #fusion-menu {
+    border-right: 1px solid CanvasText;
+  }
+}
+
+/* Pastille de navigation. Une seule pastille mesurée, déplacée en CSS : pas
+   de layout Framer au chargement, donc pas de divergence d'hydratation. */
+.nav-pill {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  z-index: 0;
+  width: 0;
+  border-radius: 999px;
+  background: #2d6b6b;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (forced-colors: active) {
+  .nav-pill {
+    background: Highlight;
+  }
+}
+
+/* ── Compétences : pile et magnétisme ────────────────────────────────────
+   Le CSS porte l'épinglage ; Framer ne conduit que l'échelle de la carte
+   sortante. `position: sticky` est natif : aucune frame JavaScript pour
+   maintenir les cartes en place. */
+.skills-stack {
+  padding-bottom: 24vh;
+}
+
+.skill-card {
+  position: sticky;
+  top: 88px;
+  margin-bottom: 20px;
+  transform-origin: top center;
+}
+
+.skill-card:nth-child(2) {
+  top: 104px;
+}
+
+.skill-card:nth-child(3) {
+  top: 120px;
+}
+
+.skill-glow {
+  top: -150px;
+  left: -150px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(45, 107, 107, 0.16) 0%,
+    transparent 68%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .skill-card:hover .skill-glow {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1100px) {
+  .skills-stack {
+    padding-bottom: 0;
+  }
+
+  .skill-card {
+    position: relative;
+    top: auto;
+    margin-bottom: 14px;
+  }
+
+  /* Les offsets 104/120 px servent au sticky desktop ; en position relative
+     ils décalaient les cartes en escalier. Le sélecteur nth-child du sticky
+     est plus spécifique que `.skill-card`, il faut le neutraliser ici. */
+  .skill-card:nth-child(2),
+  .skill-card:nth-child(3) {
+    top: auto;
+  }
+}
+
+/* Carrousel mobile par défaut, en CSS pur : la mise en page est correcte dès
+   le premier rendu, sans bascule ni décalage à l'hydratation. Masqué au-delà
+   de 767 px, où la pile sticky reprend. */
+.skills-carousel-nav,
+.skill-desc-toggle {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .skills-carousel-nav {
+    display: flex;
+  }
+
+  .skill-desc-toggle {
+    display: inline-flex;
+  }
+
+  .skills-stack.skills-carousel {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(100% - 24px);
+    /* Une seule rangée, toutes les cartes de la même hauteur et alignées en
+       haut : le swipe ne décale rien verticalement. */
+    align-items: stretch;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .skills-stack.skills-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .skills-stack.skills-carousel .skill-card {
+    width: auto;
+    margin-bottom: 0;
+    scroll-snap-align: start;
+  }
+
+  /* La grille d'outils reste ancrée en bas de la carte : l'espace laissé par
+     un texte plus court se lit comme une respiration, pas comme un vide. */
+  /* Au repos, les outils tiennent sur une seule ligne d'icônes. Les noms
+     restent dans le DOM pour les lecteurs d'écran et réapparaissent quand la
+     carte est dépliée. */
+  .skills-carousel .skill-card h3 {
+    min-height: 2em;
+  }
+
+  .skills-stack.skills-carousel .skill-card > ul {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: 4px;
+    /* Les icônes s'alignent toutes sur la même ligne, en bas des cartes.
+       18 px minimum : les neuf outils de la carte IA tiennent dans une carte
+       de 320 px sans être rognés. */
+    margin-top: auto;
+    padding-top: 20px;
+  }
+
+  .skills-stack.skills-carousel .skill-card > ul li {
+    flex: 0 0 auto;
+    width: clamp(18px, 6vw, 28px);
+    min-width: 0;
+  }
+
+  .skills-stack.skills-carousel .skill-card > ul li > span:last-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .skills-stack.skills-carousel .skill-card > ul li [data-logo-mark] {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  /* Carte dépliée : les noms reviennent sous les icônes, en grille. */
+  .skills-stack.skills-carousel .skill-card.is-expanded > ul {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 8px;
+  }
+
+  .skills-stack.skills-carousel .skill-card.is-expanded > ul li {
+    width: auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  .skills-stack.skills-carousel .skill-card.is-expanded > ul li > span:last-child {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    border: 0;
+  }
+
+  .skills-stack.skills-carousel .skill-card.is-expanded > ul li [data-logo-mark] {
+    width: 30px;
+    height: 30px;
+    aspect-ratio: auto;
+  }
+
+  /* Descriptions plafonnées à six lignes, avec une expansion animée. */
+  .skills-carousel .skill-desc {
+    max-height: 10.2em;
+    overflow: hidden;
+    transition: max-height 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .skills-carousel .skill-desc.is-clamped {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+  }
+
+  .skills-carousel .skill-desc.is-expanded {
+    max-height: 60em;
+  }
+
+  .skills-carousel:focus-visible,
+  .skills-carousel-nav button:focus-visible {
+    outline-color: #ffffff;
+  }
+
+  .skill-desc-toggle {
+    transition:
+      color 150ms cubic-bezier(0.23, 1, 0.32, 1),
+      transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .skill-desc-toggle:active {
+    transform: scale(0.97);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .skill-desc-toggle:hover {
+    color: #457878;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skills-stack {
+    padding-bottom: 0;
+  }
+
+  .skill-card {
+    position: relative;
+    top: auto;
+  }
+
+  .skill-card:nth-child(2),
+  .skill-card:nth-child(3) {
+    top: auto;
+  }
+}
+
+@media (forced-colors: active) {
+  .skill-card,
+  .skill-card [data-logo-mark] {
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+
+  .skill-glow {
+    display: none;
+  }
+}
+
+/* Numéro fantôme du tiroir mobile. Décoratif : masqué aux lecteurs d'écran
+   et retiré en contraste forcé. */
+.drawer-ghost {
+  font-family: 'Syne', system-ui, sans-serif;
+  font-size: clamp(8rem, 30vw, 11rem);
+  font-weight: 700;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.16);
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (forced-colors: active) {
+  .drawer-ghost {
+    display: none;
   }
 }
 
