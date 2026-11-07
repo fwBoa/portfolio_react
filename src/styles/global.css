@@ -57,6 +57,19 @@ body {
   overflow-x: hidden;
   overflow-x: clip;
   line-height: 1.6;
+  /* Le canevas change de couleur à la bascule : sans fondu, il sautait au
+     noir (ou au blanc) alors que le contenu, lui, s'effaçait. */
+  transition: background-color 0.3s ease;
+}
+
+/* Le mode Dev assombrit le canevas du document, pas seulement le contenu :
+   iOS peint cette couleur sous la barre d'accueil et dans la zone d'élasticité
+   du pied de page, qui restaient blanches. L'attribut est posé sur `<html>`
+   par Layout. Les règles `[data-dev='true'] *` restent valables : `<html>`
+   est l'ancêtre de tout. */
+html[data-dev='true'],
+html[data-dev='true'] body {
+  background-color: #0a0a0a;
 }
 
 /* Même secours sur le conteneur principal, qui porte le sticky des cartes. */

@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { FaCode } from 'react-icons/fa';
 import SiteHeader from './SiteHeader';
 import SiteHeaderFusion from './SiteHeaderFusion';
@@ -20,6 +22,12 @@ import SmoothScroll from './SmoothScroll';
  * remontent pas jusqu'à une prop React, et le teal du site (2,4:1 sur le fond
  * sombre) y serait invisible.
  *
+ * Il est posé sur `<html>` et non sur ce conteneur : c'est la couleur de fond
+ * du document que doit suivre le mode. iOS peint cette couleur dans les zones
+ * hors du contenu (barre d'accueil, zone d'élasticité sous le pied de page),
+ * et elle restait blanche en mode Dev. Le fond n'est donc plus porté ici : le
+ * canevas du document le porte, et il peut s'assombrir en fondu.
+ *
  * `isDevMode` et `toggleMode` ne sont transmis que par l'accueil — les pages du
  * blog n'ont pas de vue terminal, la bascule ne leur est donc pas proposée.
  *
@@ -34,27 +42,49 @@ const Layout = ({
   toggleMode,
   activeSection = null,
   notesHref = '/#notes',
-}) => (
-  <div
-    data-dev={isDevMode}
-    className={`min-h-screen flex flex-col ${
-      isDevMode ? 'bg-dev-bg text-dev-text' : 'bg-os-bg text-os-text'
-    }`}
-  >
-    <a href="#main" className="skip-link">
-      Aller au contenu
-    </a>
-    {!isDevMode && <SmoothScroll />}
-    {isDevMode ? (
-      <SiteHeader toggleMode={toggleMode} />
-    ) : (
-      <SiteHeaderFusion activeSection={activeSection} notesHref={notesHref} />
-    )}
-    {children}
-    <SiteFooter isDevMode={isDevMode} />
-    {!isDevMode && toggleMode && <DevSwitch toggleMode={toggleMode} />}
-  </div>
-);
+}) => {
+  useEffect(() => {
+    document.documentElement.dataset.dev = String(isDevMode);
+    return () => {
+      document.documentElement.dataset.dev = 'false';
+    };
+  }, [isDevMode]);
+
+  return (
+    <div
+      className={`min-h-screen flex flex-col ${
+        isDevMode ? 'text-dev-text' : 'text-os-text'
+      }`}
+    >
+      <a href="#main" className="skip-link">
+        Aller au contenu
+      </a>
+      {!isDevMode && <SmoothScroll />}
+      {/* Les deux en-têtes sont `fixed` : ils n'occupent aucune place dans le
+          flux, donc ils peuvent se croiser. Sans ce fondu, la capsule claire
+          laissait place à la barre noire d'un coup, en plein milieu du fondu
+          du contenu. */}
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={isDevMode ? 'dev' : 'public'}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
+        >
+          {isDevMode ? (
+            <SiteHeader toggleMode={toggleMode} />
+          ) : (
+            <SiteHeaderFusion activeSection={activeSection} notesHref={notesHref} />
+          )}
+        </motion.div>
+      </AnimatePresence>
+      {children}
+      <SiteFooter isDevMode={isDevMode} />
+      {!isDevMode && toggleMode && <DevSwitch toggleMode={toggleMode} />}
+    </div>
+  );
+};
 
 /**
  * Entrée du mode Dev, séparée de la navigation. C'est le seul contrôle qui
