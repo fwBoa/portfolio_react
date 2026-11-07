@@ -8,8 +8,13 @@ import { site } from '../data/site';
 import SkillsSection from './SkillsSection';
 import NotesSection from './NotesSection';
 
+/**
+ * Chaque lettre est une balise distincte pour l'animation. Sans
+ * `aria-hidden`, les lecteurs d'écran reçoivent une suite de lettres isolées
+ * et peuvent épeler le nom ; le nom complet est fourni en `sr-only` par le h1.
+ */
 const AnimatedLetters = ({ text, className = '', delayOffset = 0 }) => (
-  <span className={`${className} inline-block overflow-hidden`}>
+  <span className={`${className} inline-block overflow-hidden`} aria-hidden="true">
     {text.split('').map((char, i) => (
       <span
         key={`${char}-${i}`}
@@ -30,15 +35,27 @@ const Face = ({ posts = [] }) => {
   const rawAvatarY = useTransform(scrollY, [0, 800], [0, -50]);
   const avatarY = useSpring(rawAvatarY, { stiffness: 100, damping: 30, restDelta: 0.001 });
 
-  // L'entrée du hero est déclenchée après le montage : lancée au chargement
-  // de la feuille de style, elle était déjà finie quand l'écran s'affichait
-  // sur iPhone. Le HTML reste visible avant l'hydratation.
+  // L'entrée du hero attend `load` (premier rendu effectif) et les polices :
+  // déclenchée au montage, elle se terminait pendant que l'iPhone affichait
+  // encore du blanc, et le visiteur ne voyait que le résultat final.
+  // Le mouvement réduit est géré en CSS, qui garde un fondu sans translation.
   const [heroEnter, setHeroEnter] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
-    const frame = window.requestAnimationFrame(() => setHeroEnter(true));
-    return () => window.cancelAnimationFrame(frame);
+    let frame = 0;
+
+    const start = () => {
+      frame = window.requestAnimationFrame(() => setHeroEnter(true));
+    };
+    const onLoad = () => document.fonts.ready.then(start, start);
+
+    if (document.readyState === 'complete') onLoad();
+    else window.addEventListener('load', onLoad, { once: true });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('load', onLoad);
+    };
   }, []);
 
   return (
@@ -61,6 +78,9 @@ const Face = ({ posts = [] }) => {
           {/* Name + Avatar — un seul h1, ses deux lignes sont des spans */}
           <div className="relative">
             <h1 className="text-[clamp(2.8rem,13vw,14rem)] font-display font-bold leading-[0.82] tracking-[-0.04em] text-center">
+              {/* Les lettres visuelles sont décoratives : le nom complet est
+                  fourni ici, en un seul bloc, pour les lecteurs d'écran. */}
+              <span className="sr-only">Jean-David Zamblezie</span>
               <span className="block">
                 <AnimatedLetters text="Jean-David" />
               </span>

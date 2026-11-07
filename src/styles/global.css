@@ -205,9 +205,9 @@ body {
   }
 }
 
-/* L'animation démarre après le montage React, sinon elle peut être terminée
-   avant que le premier écran soit visible sur iPhone. Le HTML statique reste
-   lisible sans JavaScript. */
+/* La classe `hero-enter` n'est posée qu'après `load` : lancée plus tôt, sur
+   iPhone, l'animation était terminée avant le premier écran visible. Le HTML
+   statique reste lisible sans JavaScript. */
 .hero-enter .hero-letter {
   animation: hero-letter-enter 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) backwards;
 }
@@ -227,6 +227,17 @@ body {
 
 .hero-enter .hero-avatar-enter {
   animation: hero-avatar-enter 0.9s cubic-bezier(0.25, 0.1, 0.25, 1) backwards;
+}
+
+/* Variante sans déplacement, utilisée quand le système demande moins de
+   mouvement (voir le bloc « prefers-reduced-motion » plus bas). */
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Terminal cursor blink */
@@ -477,9 +488,15 @@ body {
     scroll-behavior: auto;
   }
 
-  .hero-letter,
-  .hero-avatar-enter {
-    animation: none;
+  /* Le hero garde un fondu, sans translation : même politique que Framer
+     (MotionConfig reducedMotion="user"), qui conserve les opacités et retire
+     les déplacements. Sans cela, l'animation disparaissait entièrement pour
+     les visiteurs ayant activé « Réduire les animations ». La durée est
+     rétablie après la règle globale ci-dessus, qui la réduit à 0,01 ms. */
+  .hero-enter .hero-letter,
+  .hero-enter .hero-avatar-enter {
+    animation: hero-fade-in 0.4s ease-out backwards;
+    animation-duration: 0.4s !important;
   }
 }
 
