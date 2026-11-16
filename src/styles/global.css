@@ -654,6 +654,10 @@ html[data-dev='true'] body {
   display: none;
 }
 
+.skills-carousel-frame {
+  position: relative;
+}
+
 @media (max-width: 767px) {
   .skills-carousel-nav {
     display: flex;
@@ -686,6 +690,39 @@ html[data-dev='true'] body {
     width: auto;
     margin-bottom: 0;
     scroll-snap-align: start;
+    /* L'entrée `translateY(44px)` de framer dépassait le conteneur : le
+       carrousel devenait défilable verticalement de 44 px et la carte
+       glissait vers le bas pendant le swipe. Ici, le fondu suffit. */
+    transform: none !important;
+  }
+
+  /* Flou de mouvement sur les bords : deux bandes dont l'intensité suit la
+     vitesse du swipe (variables posées en JavaScript). */
+  .carousel-blur {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .carousel-blur-left {
+    left: 0;
+    opacity: var(--mb-o-l, 0);
+    -webkit-backdrop-filter: blur(var(--mb-l, 0px));
+    backdrop-filter: blur(var(--mb-l, 0px));
+    -webkit-mask-image: linear-gradient(to right, #000 15%, transparent);
+    mask-image: linear-gradient(to right, #000 15%, transparent);
+  }
+
+  .carousel-blur-right {
+    right: 0;
+    opacity: var(--mb-o-r, 0);
+    -webkit-backdrop-filter: blur(var(--mb-r, 0px));
+    backdrop-filter: blur(var(--mb-r, 0px));
+    -webkit-mask-image: linear-gradient(to left, #000 15%, transparent);
+    mask-image: linear-gradient(to left, #000 15%, transparent);
   }
 
   /* La grille d'outils reste ancrée en bas de la carte : l'espace laissé par

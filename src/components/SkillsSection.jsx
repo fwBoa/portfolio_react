@@ -342,6 +342,7 @@ const SkillCard = ({ category, index, cardRef, nextRef }) => {
 const SkillsSection = () => {
   const refs = useRef([]);
   const stackRef = useRef(null);
+  const blurFrameRef = useRef(null);
   const [carousel, setCarousel] = useState(false);
   const [activeSkill, setActiveSkill] = useState(0);
 
@@ -404,6 +405,70 @@ const SkillsSection = () => {
     });
   };
 
+  // Flou de mouvement sur les bords du carrousel : il suit la vitesse
+  // horizontale réelle et s'éteint dès que le doigt s'arrête. Rien n'est
+  // rendu par React, seules deux variables CSS changent pendant le swipe.
+  useEffect(() => {
+    const root = stackRef.current;
+    const frame = blurFrameRef.current;
+    if (!root || !frame) return undefined;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
+
+    let raf = 0;
+    let lastLeft = root.scrollLeft;
+    let lastTime = 0;
+    let speed = 0;
+    let maxScroll = root.scrollWidth - root.clientWidth;
+
+    const paint = (intensity) => {
+      const blur = `${(intensity * 4).toFixed(2)}px`;
+      const atStart = root.scrollLeft <= 2;
+      const atEnd = root.scrollLeft >= maxScroll - 2;
+      const left = atStart ? 0 : intensity;
+      const right = atEnd ? 0 : intensity;
+
+      frame.style.setProperty('--mb-l', left ? blur : '0px');
+      frame.style.setProperty('--mb-r', right ? blur : '0px');
+      frame.style.setProperty('--mb-o-l', left.toFixed(3));
+      frame.style.setProperty('--mb-o-r', right.toFixed(3));
+    };
+
+    const tick = (time) => {
+      const left = root.scrollLeft;
+      const dt = Math.max(time - lastTime, 16);
+      speed = speed * 0.72 + (Math.abs(left - lastLeft) / dt) * 0.28;
+      lastLeft = left;
+      lastTime = time;
+
+      const intensity = Math.min(speed / 1.6, 1);
+      paint(intensity);
+
+      if (intensity > 0.01) {
+        raf = window.requestAnimationFrame(tick);
+      } else {
+        paint(0);
+        raf = 0;
+      }
+    };
+
+    const start = () => {
+      if (raf) return;
+      // On garde `lastLeft` du dernier échantillon : l'événement `scroll`
+      // arrive après le déplacement, le relire ici annulerait le delta.
+      maxScroll = root.scrollWidth - root.clientWidth;
+      lastTime = window.performance.now();
+      raf = window.requestAnimationFrame(tick);
+    };
+
+    root.addEventListener('scroll', start, { passive: true });
+
+    return () => {
+      root.removeEventListener('scroll', start);
+      if (raf) window.cancelAnimationFrame(raf);
+      paint(0);
+    };
+  }, []);
+
   return (
     <section id="skills" className="relative bg-os-text text-white">
       <div className="px-5 py-[72px] sm:px-10 sm:py-24 lg:px-12 lg:py-[120px]">
@@ -451,23 +516,27 @@ const SkillsSection = () => {
             </div>
           </div>
 
-          <div
-            ref={stackRef}
-            role={carousel ? 'region' : undefined}
-            aria-label={carousel ? 'Compétences, faites défiler horizontalement' : undefined}
-            aria-roledescription={carousel ? 'carrousel' : undefined}
-            tabIndex={carousel ? 0 : undefined}
-            className="skills-stack skills-carousel"
-          >
-            {skillGroups.map((category, index) => (
-              <SkillCard
-                key={category.num}
-                category={category}
-                index={index}
-                cardRef={refs.current[index]}
-                nextRef={refs.current[index + 1] || null}
-              />
-            ))}
+          <div ref={blurFrameRef} className="skills-carousel-frame">
+            <div
+              ref={stackRef}
+              role={carousel ? 'region' : undefined}
+              aria-label={carousel ? 'Compétences, faites défiler horizontalement' : undefined}
+              aria-roledescription={carousel ? 'carrousel' : undefined}
+              tabIndex={carousel ? 0 : undefined}
+              className="skills-stack skills-carousel"
+            >
+              {skillGroups.map((category, index) => (
+                <SkillCard
+                  key={category.num}
+                  category={category}
+                  index={index}
+                  cardRef={refs.current[index]}
+                  nextRef={refs.current[index + 1] || null}
+                />
+              ))}
+            </div>
+            <span aria-hidden="true" className="carousel-blur carousel-blur-left" />
+            <span aria-hidden="true" className="carousel-blur carousel-blur-right" />
           </div>
         </div>
       </div>
