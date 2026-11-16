@@ -45,7 +45,13 @@ const Home = ({ posts = [] }) => {
     focusAfterToggle.current = false;
 
     const timer = window.setTimeout(() => {
-      document.getElementById('main')?.focus({ preventScroll: true });
+      // Pendant le fondu, deux `main` coexistent : viser la face active
+      // évite de donner le focus à la sortante, déjà `inert`.
+      const main =
+        document.querySelector('[data-face-active="true"] main') ||
+        document.getElementById('main');
+
+      main?.focus({ preventScroll: true });
     }, 430);
 
     return () => window.clearTimeout(timer);
@@ -86,9 +92,13 @@ const Home = ({ posts = [] }) => {
 
   return (
     <Layout isDevMode={isDevMode} toggleMode={toggleMode} activeSection={activeSection}>
-      <ToggleFace isDevMode={isDevMode}>
-        {isDevMode ? <DevFace /> : <Face posts={posts} animateIntro={!hasToggledMode} />}
-      </ToggleFace>
+      <ToggleFace
+        isDevMode={isDevMode}
+        faces={{
+          public: <Face posts={posts} animateIntro={!hasToggledMode} />,
+          dev: <DevFace />,
+        }}
+      />
     </Layout>
   );
 };
