@@ -30,7 +30,7 @@ const AnimatedLetters = ({ text, className = '', delayOffset = 0 }) => (
   </span>
 );
 
-const Face = ({ posts = [] }) => {
+const Face = ({ posts = [], animateIntro = true }) => {
   const { scrollY } = useScroll();
   const rawAvatarY = useTransform(scrollY, [0, 800], [0, -50]);
   const avatarY = useSpring(rawAvatarY, { stiffness: 100, damping: 30, restDelta: 0.001 });
@@ -42,6 +42,10 @@ const Face = ({ posts = [] }) => {
   const [heroEnter, setHeroEnter] = useState(false);
 
   useEffect(() => {
+    // Au retour du terminal, le fondu de ToggleFace suffit : rejouer
+    // l’entrée masquait de nouveau le nom déjà affiché.
+    if (!animateIntro) return undefined;
+
     let frame = 0;
 
     const start = () => {
@@ -56,7 +60,7 @@ const Face = ({ posts = [] }) => {
       window.cancelAnimationFrame(frame);
       window.removeEventListener('load', onLoad);
     };
-  }, []);
+  }, [animateIntro]);
 
   return (
     <main
@@ -124,7 +128,7 @@ const Face = ({ posts = [] }) => {
 
           {/* Tagline + CV */}
           <motion.div
-            initial={{ opacity: 0 }}
+            initial={animateIntro ? { opacity: 0 } : false}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.7 }}
             className="mt-16 sm:mt-20 lg:mt-28 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 sm:gap-8"

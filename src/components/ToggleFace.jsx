@@ -1,29 +1,38 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useIsPresent } from 'framer-motion';
 
-/**
- * ToggleFace — fondu court entre la face publique et le terminal.
- *
- * `initial={false}` sur l'AnimatePresence : pas de fondu au premier
- * chargement, seulement lors des bascules. Le léger glissement vertical est
- * désactivé par `MotionConfig reducedMotion="user"` quand le système demande
- * moins de mouvement ; l'opacité, elle, reste.
- *
- * Aucune transformation permanente sur le conteneur : le `position: sticky`
- * des cartes de compétences n'a pas de containing block parasite.
- */
-const ToggleFace = ({ isDevMode, children }) => (
-  <AnimatePresence mode="wait" initial={false}>
+// Les deux faces occupent la même cellule pendant le fondu. La face sortante
+// reste dans le flux jusqu'à la fin, mais ne reçoit plus de clic ni de focus.
+const FaceLayer = ({ children }) => {
+  const isPresent = useIsPresent();
+
+  return (
     <motion.div
-      key={isDevMode ? 'dev' : 'normal'}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       transition={{ duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
-      className="w-full"
+      inert={!isPresent}
+      aria-hidden={isPresent ? undefined : true}
+      className="col-start-1 row-start-1 min-w-0 w-full self-start"
     >
       {children}
     </motion.div>
-  </AnimatePresence>
+  );
+};
+
+/**
+ * Fondu simultané : `wait` laissait le canevas seul entre les deux faces,
+ * ce qui produisait un flash, surtout au retour vers le fond blanc.
+ * Pas de translation du document entier ni d'animation au premier rendu.
+ */
+const ToggleFace = ({ isDevMode, children }) => (
+  <div className="grid w-full">
+    <AnimatePresence initial={false}>
+      <FaceLayer key={isDevMode ? 'dev' : 'normal'}>
+        {children}
+      </FaceLayer>
+    </AnimatePresence>
+  </div>
 );
 
 export default ToggleFace;

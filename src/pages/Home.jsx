@@ -22,8 +22,10 @@ const Home = ({ posts = [] }) => {
   const [konamiCode, setKonamiCode] = useState([]);
   const activeSection = useScrollSpy(SECTION_IDS);
   const focusAfterToggle = useRef(false);
+  const [hasToggledMode, setHasToggledMode] = useState(false);
 
   const toggleMode = () => {
+    setHasToggledMode(true);
     focusAfterToggle.current = true;
     setIsDevMode((prev) => {
       const next = !prev;
@@ -85,7 +87,7 @@ const Home = ({ posts = [] }) => {
   return (
     <Layout isDevMode={isDevMode} toggleMode={toggleMode} activeSection={activeSection}>
       <ToggleFace isDevMode={isDevMode}>
-        {isDevMode ? <DevFace /> : <Face posts={posts} />}
+        {isDevMode ? <DevFace /> : <Face posts={posts} animateIntro={!hasToggledMode} />}
       </ToggleFace>
     </Layout>
   );
